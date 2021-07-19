@@ -1,0 +1,51 @@
+// Copyright (C) 2021  Shanhu Tech Inc.
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU Affero General Public License as published by the
+// Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+// for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+package identity
+
+// Identity is the identity of a service or a robot.
+type Identity struct {
+	PublicKeys []*PublicKey `json:",omitempty"`
+}
+
+// PublicKey is the public key of an identity.
+type PublicKey struct {
+	ID             string
+	Type           string
+	Alg            string // Signing alghorithm,must use JWT alg codes.
+	Key            string // Key content.
+	NotValidAfter  int64
+	NotValidBefore int64  `json:",omitempty"`
+	Comment        string `json:",omitempty"`
+}
+
+// FindPublicKey finds the public key of the given ID.
+// Returns nil if not found.
+func FindPublicKey(id *Identity, keyID string) *PublicKey {
+	var pub *PublicKey
+	for _, k := range id.PublicKeys {
+		if k.ID == keyID {
+			pub = k
+			break
+		}
+	}
+	return pub
+}
+
+// Card provides the Identity of an entity.
+type Card interface {
+	// Identity fetches the identity of the service.
+	Identity() (*Identity, error)
+}
