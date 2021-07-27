@@ -206,6 +206,9 @@ func Dial(server string) (*httputil.Client, error) {
 
 // DialAsUser logins the server as user and returns the httputil client.
 func DialAsUser(user, server string) (*httputil.Client, error) {
+	if user == "" {
+		return Dial(server)
+	}
 	ep := &Endpoint{
 		User:     user,
 		Server:   server,
