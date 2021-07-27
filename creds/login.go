@@ -204,6 +204,24 @@ func Dial(server string) (*httputil.Client, error) {
 	return httputil.NewTokenClient(server, tok)
 }
 
+// DialAsUser logins the server as user and returns the httputil client.
+func DialAsUser(user, server string) (*httputil.Client, error) {
+	ep := &Endpoint{
+		User:   user,
+		Server: server,
+		Homeless: true,
+	}
+	login, err := NewLogin(ep)
+	if err != nil {
+		return nil, err
+	}
+	tok, err := login.Token()
+	if err != nil {
+		return nil, err
+	}
+	return httputil.NewTokenClient(server, tok)
+}
+
 // DialEndpoint creates a token client with the given endpoint.
 func DialEndpoint(p *Endpoint) (*httputil.Client, error) {
 	login, err := NewLogin(p)
