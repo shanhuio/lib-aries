@@ -210,9 +210,8 @@ func DialAsUser(user, server string) (*httputil.Client, error) {
 		return Dial(server)
 	}
 	ep := &Endpoint{
-		User:     user,
-		Server:   server,
-		Homeless: true,
+		User:   user,
+		Server: server,
 	}
 	login, err := NewLogin(ep)
 	if err != nil {
