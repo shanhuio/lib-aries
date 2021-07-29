@@ -10,5 +10,5 @@ require (
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
 	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
-	shanhu.io/misc v0.0.0-20210727232908-86e01d6576a5
+	shanhu.io/misc v0.0.0-20210727233346-04a4e7a1bf7a
 )
