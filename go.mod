@@ -3,7 +3,7 @@ module shanhu.io/aries
 go 1.16
 
 require (
-	cloud.google.com/go v0.88.0 // indirect
+	cloud.google.com/go v0.89.0 // indirect
 	github.com/digitalocean/godo v1.64.2
 	github.com/google/go-querystring v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
