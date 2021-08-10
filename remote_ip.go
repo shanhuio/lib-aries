@@ -21,25 +21,22 @@ import (
 )
 
 // RemoteIP returns the remote IP address.
-func RemoteIP(c *C) string {
+func RemoteIP(c *C) net.IP {
 	forwardedFor := c.Req.Header.Get("X-Forwarded-For")
 	ips := strings.Split(forwardedFor, ",")
 	for _, ip := range ips {
 		if parsed := net.ParseIP(ip); parsed != nil {
-			return parsed.String()
+			return parsed
 		}
 	}
 
 	remoteAddr := c.Req.RemoteAddr
 	if remoteAddr == "@" || remoteAddr == "" {
-		return ""
+		return nil
 	}
 	host, _, err := net.SplitHostPort(remoteAddr)
 	if err != nil {
-		return ""
+		return nil
 	}
-	if parsed := net.ParseIP(host); parsed != nil {
-		return parsed.String()
-	}
-	return ""
+	return net.ParseIP(host)
 }
