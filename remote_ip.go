@@ -40,3 +40,13 @@ func RemoteIP(c *C) net.IP {
 	}
 	return net.ParseIP(host)
 }
+
+// RemoteIPString returns the string form of the remote IP address.
+// It returns empty string when IP cannot be determined.
+func RemoteIPString(c *C) string {
+	ip := RemoteIP(c)
+	if ip == nil {
+		return ""
+	}
+	return ip.String()
+}
