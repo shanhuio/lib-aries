@@ -18,8 +18,12 @@ package aries
 import (
 	"context"
 	"flag"
+	"fmt"
+	"hash/fnv"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"shanhu.io/misc/errcode"
@@ -88,5 +92,20 @@ func RunMainLegacy(
 
 // DeclareAddrFlag declares the -addr flag.
 func DeclareAddrFlag(def string) *string {
+	if def == "" {
+		if addr := os.Getenv("ADDR"); addr != "" {
+			def = addr
+		}
+		if port := os.Getenv("PORT"); port != "" {
+			def = ":" + port
+		}
+		if len(os.Args) > 0 {
+			h := fnv.New32()
+			io.WriteString(h, os.Args[0])
+			const offset = 8000
+			def = fmt.Sprintf("localhost:%d", offset+h.Sum32()%1000)
+		}
+	}
+
 	return flag.String("addr", def, "address to listen on")
 }
