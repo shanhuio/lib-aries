@@ -18,18 +18,12 @@ package static
 import (
 	"testing"
 
-	"shanhu.io/aries"
 	"shanhu.io/aries/ariestest"
 	"shanhu.io/misc/httputil"
 )
 
 func TestMain(t *testing.T) {
-	config := &config{Dir: "testdata"}
-	service, err := main(&aries.Env{Config: config})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	service := makeService("testdata")
 	s, err := ariestest.HTTPSServer("shanhu.io", service)
 	if err != nil {
 		t.Fatal(err)

@@ -58,6 +58,7 @@ func loadConfig(file string, config interface{}) error {
 // ListenAndServe serves on the address. If the address ends
 // with .sock, it ListenAndServe's on the unix domain socket.
 func ListenAndServe(addr string, s Service) error {
+	log.Printf("serve on %q", addr)
 	if strings.HasSuffix(addr, ".sock") {
 		return unixhttp.ListenAndServe(addr, Serve(s))
 	}
@@ -81,13 +82,17 @@ func runMain(
 		return err
 	}
 
-	log.Printf("serve on %s", addr)
 	return ListenAndServe(addr, s)
+}
+
+// DeclareAddrFlag declares the -addr flag.
+func DeclareAddrFlag(def string) *string {
+	return flag.String("addr", def, "address to listen on")
 }
 
 // Main launches a service with the given config structure, and default
 // address.
-func Main(b BuildFunc, config interface{}, addr string) {
+func oldMain(b BuildFunc, config interface{}, addr string) {
 	flag.StringVar(&addr, "addr", addr, "address to listen on")
 	var configFile string
 	if config != nil {
@@ -100,8 +105,7 @@ func Main(b BuildFunc, config interface{}, addr string) {
 	}
 }
 
-// SimpleMain launches a service with no config and default address.
-func SimpleMain(service Service, addr string) {
+func simpleMain(service Service, addr string) {
 	f := func(_ *Env) (Service, error) { return service, nil }
-	Main(f, nil, addr)
+	oldMain(f, nil, addr)
 }

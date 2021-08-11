@@ -16,6 +16,9 @@
 package redirect
 
 import (
+	"flag"
+	"log"
+
 	"shanhu.io/aries"
 )
 
@@ -50,5 +53,17 @@ func makeService(env *aries.Env) (aries.Service, error) {
 
 // Main is the main entrance for the redirect service.
 func Main() {
-	aries.Main(makeService, new(config), "localhost:8000")
+	addr := aries.DeclareAddrFlag("localhost:8000")
+	to := flag.String("to", "", "redirect to this address")
+	flag.Parse()
+
+	config := &config{RedirectToDomain: *to}
+
+	f, err := newServer(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := aries.ListenAndServe(*addr, f); err != nil {
+		log.Fatal(err)
+	}
 }

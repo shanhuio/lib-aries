@@ -18,6 +18,9 @@
 package redhttp
 
 import (
+	"flag"
+	"log"
+
 	"shanhu.io/aries"
 	"shanhu.io/misc/errcode"
 )
@@ -37,5 +40,9 @@ func Redirect(c *aries.C) error {
 
 // Main is the main entrance for the service.
 func Main() {
-	aries.SimpleMain(aries.Func(Redirect), "localhost:8080")
+	addr := aries.DeclareAddrFlag("localhost:8000")
+	flag.Parse()
+	if err := aries.ListenAndServe(*addr, aries.Func(Redirect)); err != nil {
+		log.Fatal(err)
+	}
 }

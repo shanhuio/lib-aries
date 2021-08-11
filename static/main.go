@@ -16,19 +16,24 @@
 package static
 
 import (
+	"flag"
+	"log"
+
 	"shanhu.io/aries"
 )
 
-type config struct {
-	Dir string // home directory
-}
-
-func main(env *aries.Env) (aries.Service, error) {
-	static := aries.NewStaticFiles(env.Config.(*config).Dir)
-	return static, nil
+func makeService(dir string) aries.Service {
+	return aries.NewStaticFiles(dir)
 }
 
 // Main is the main entrance for smlstatic binary
 func Main() {
-	aries.Main(main, new(config), "localhost:8000")
+	dir := flag.String("dir", ".", "static directory to serve")
+	addr := aries.DeclareAddrFlag("localhost:8000")
+	flag.Parse()
+
+	static := makeService(*dir)
+	if err := aries.ListenAndServe(*addr, static); err != nil {
+		log.Fatal(err)
+	}
 }
