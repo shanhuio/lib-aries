@@ -65,7 +65,8 @@ func ListenAndServe(addr string, s Service) error {
 	return http.ListenAndServe(addr, Serve(s))
 }
 
-func runMain(
+// RunMainLegacy runs the main body of a http server.
+func RunMainLegacy(
 	b BuildFunc, configFile string, config interface{}, addr string,
 ) error {
 	if config != nil {
@@ -88,24 +89,4 @@ func runMain(
 // DeclareAddrFlag declares the -addr flag.
 func DeclareAddrFlag(def string) *string {
 	return flag.String("addr", def, "address to listen on")
-}
-
-// Main launches a service with the given config structure, and default
-// address.
-func oldMain(b BuildFunc, config interface{}, addr string) {
-	flag.StringVar(&addr, "addr", addr, "address to listen on")
-	var configFile string
-	if config != nil {
-		flag.StringVar(&configFile, "config", "", "config file")
-	}
-	flag.Parse()
-
-	if err := runMain(b, configFile, config, addr); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func simpleMain(service Service, addr string) {
-	f := func(_ *Env) (Service, error) { return service, nil }
-	oldMain(f, nil, addr)
 }
