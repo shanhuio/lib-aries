@@ -16,6 +16,7 @@
 package creds
 
 import (
+	"context"
 	"crypto/rsa"
 	"time"
 
@@ -184,6 +185,19 @@ func (lg *Login) Dial() (*httputil.Client, error) {
 	}
 	c.Transport = lg.endPoint.Transport
 	return c, nil
+}
+
+type loginTokenSource struct {
+	login *Login
+}
+
+func (s *loginTokenSource) Token(_ context.Context) (string, error) {
+	return s.login.Token()
+}
+
+// TokenSource converts the login to a TokenSource.
+func (lg *Login) TokenSource() httputil.TokenSource {
+	return &loginTokenSource{login: lg}
 }
 
 // LoginServer uses the default setting to login into a server.
