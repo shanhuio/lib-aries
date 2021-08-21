@@ -43,7 +43,8 @@ type gitHub struct {
 
 const gitHubEmailScope = "user:email"
 
-var gitHubEndpoint = oauth2.Endpoint{
+// GitHubEndpoint is the oauth2 endpoint for GitHub.
+var GitHubEndpoint = oauth2.Endpoint{
 	AuthURL:  "https://github.com/login/oauth/authorize",
 	TokenURL: "https://github.com/login/oauth/access_token",
 }
@@ -67,7 +68,7 @@ func newGitHub(app *GitHubApp, s *signer.Sessions) *gitHub {
 			ClientID:     app.ID,
 			ClientSecret: app.Secret,
 			Scopes:       scopes, // only need public information
-			Endpoint:     gitHubEndpoint,
+			Endpoint:     GitHubEndpoint,
 			RedirectURL:  app.RedirectURL,
 		}, s, MethodGitHub,
 	)

@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"golang.org/x/oauth2"
-	goauth2 "golang.org/x/oauth2/google"
 	"shanhu.io/aries"
 	"shanhu.io/aries/oauth"
 	"shanhu.io/misc/errcode"
@@ -67,7 +66,7 @@ func New(c *Config) *Mailman {
 		ClientID:     c.App.ID,
 		ClientSecret: c.App.Secret,
 		Scopes:       scopes,
-		Endpoint:     goauth2.Endpoint,
+		Endpoint:     oauth.GoogleEndpoint,
 		RedirectURL:  c.App.RedirectURL,
 	}
 
