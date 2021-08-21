@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"golang.org/x/oauth2"
-	goauth2 "golang.org/x/oauth2/google"
 	"shanhu.io/aries"
 	"shanhu.io/misc/signer"
 	"shanhu.io/misc/strutil"
@@ -65,6 +64,18 @@ const (
 	googleProfileScope = "https://www.googleapis.com/auth/userinfo.profile"
 )
 
+// googleEndpoint is google's oauth2 endpoint. This is copied from
+// golang.org/x/oauth2/google, to avoid dragging in useless dependencies such
+// as protobuf.
+//
+// Google engineers really should be more careful with their package dependency
+// management.
+var googleEndpoint = oauth2.Endpoint{
+	AuthURL:   "https://accounts.google.com/o/oauth2/auth",
+	TokenURL:  "https://oauth2.googleapis.com/token",
+	AuthStyle: oauth2.AuthStyleInParams,
+}
+
 type google struct{ c *Client }
 
 func newGoogle(app *GoogleApp, s *signer.Sessions) *google {
@@ -83,7 +94,7 @@ func newGoogle(app *GoogleApp, s *signer.Sessions) *google {
 			ClientID:     app.ID,
 			ClientSecret: app.Secret,
 			Scopes:       scopes,
-			Endpoint:     goauth2.Endpoint,
+			Endpoint:     googleEndpoint,
 			RedirectURL:  app.RedirectURL,
 		}, s, MethodGoogle,
 	)
