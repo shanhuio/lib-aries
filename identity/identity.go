@@ -15,9 +15,20 @@
 
 package identity
 
+// Card provides the Identity of an entity.
+type Card interface {
+	// Identity fetches the identity of the service.
+	Identity() (*Identity, error)
+}
+
 // Identity is the identity of a service or a robot.
 type Identity struct {
 	PublicKeys []*PublicKey `json:",omitempty"`
+}
+
+// Identity returns itself, so it implements the Card interface.
+func (id *Identity) Identity() (*Identity, error) {
+	return id, nil
 }
 
 // PublicKey is the public key of an identity.
@@ -42,10 +53,4 @@ func FindPublicKey(id *Identity, keyID string) *PublicKey {
 		}
 	}
 	return pub
-}
-
-// Card provides the Identity of an entity.
-type Card interface {
-	// Identity fetches the identity of the service.
-	Identity() (*Identity, error)
 }
