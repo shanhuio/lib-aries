@@ -18,9 +18,9 @@ package signin
 import (
 	"testing"
 
+	"fmt"
 	"net/http/httptest"
 	"net/url"
-	"fmt"
 	"time"
 
 	"shanhu.io/aries"
@@ -48,7 +48,7 @@ func TestDirectIDGate(t *testing.T) {
 	})
 
 	admin := aries.NewRouter()
-	admin.Get("user", func (c *aries.C) error {
+	admin.Get("user", func(c *aries.C) error {
 		fmt.Fprint(c.Resp, c.User)
 		return nil
 	})
