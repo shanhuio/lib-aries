@@ -20,8 +20,6 @@ import (
 
 	"shanhu.io/aries"
 	"shanhu.io/aries/identity"
-
-	"log"
 )
 
 // IDGateConfig contains the configuration to create a ID gate.
@@ -63,11 +61,7 @@ func (g *IDGate) Gate() *identity.Gate {
 
 // Serve serves the sign in
 func (g *IDGate) Serve(c *aries.C) error {
-	err := g.router.Serve(c)
-	if err != nil {
-		log.Println(c.Path, err)
-	}
-	return err
+	return g.router.Serve(c)
 }
 
 // Setup sets up the credentials for the request.

@@ -15,8 +15,15 @@
 
 package identity
 
+import (
+	"context"
+)
+
 // Card provides the Identity of an entity.
 type Card interface {
+	// Prepare prepares the identity for use.
+	Prepare(ctx context.Context) error
+
 	// Identity fetches the identity of the service.
 	Identity() (*Identity, error)
 }
@@ -26,10 +33,11 @@ type Identity struct {
 	PublicKeys []*PublicKey `json:",omitempty"`
 }
 
+// Prepare does nothing and always returns nil.
+func (id *Identity) Prepare(context.Context) error { return nil }
+
 // Identity returns itself, so it implements the Card interface.
-func (id *Identity) Identity() (*Identity, error) {
-	return id, nil
-}
+func (id *Identity) Identity() (*Identity, error) { return id, nil }
 
 // PublicKey is the public key of an identity.
 type PublicKey struct {

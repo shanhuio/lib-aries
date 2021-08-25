@@ -16,7 +16,6 @@
 package signin
 
 import (
-	"context"
 	"time"
 
 	"shanhu.io/aries"
@@ -31,7 +30,7 @@ import (
 type IDExchangeConfig struct {
 	Audience string
 	Issuer   string
-	Card     *identity.RemoteCard
+	Card     identity.Card
 }
 
 // IDExchange exchanges an ID token for an access token.
@@ -39,7 +38,6 @@ type IDExchange struct {
 	audience string
 	issuer   string
 	card     identity.Card
-	prepare  func(ctx context.Context) error
 	verifier jwt.Verifier
 	tokener  Tokener
 	now      func() time.Time
@@ -53,7 +51,6 @@ func NewIDExchange(
 		audience: config.Audience,
 		issuer:   config.Issuer,
 		card:     config.Card,
-		prepare:  config.Card.Prepare,
 		verifier: identity.NewJWTVerifier(config.Card),
 		tokener:  tok,
 		now:      time.Now,
@@ -68,10 +65,8 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.InvalidArgf("id token missing")
 	}
 
-	if x.prepare != nil {
-		if err := x.prepare(c.Context); err != nil {
-			return nil, errcode.Annotate(err, "prepare for checking")
-		}
+	if err := x.card.Prepare(c.Context); err != nil {
+		return nil, errcode.Annotate(err, "prepare for checking")
 	}
 
 	now := x.now()
@@ -80,14 +75,12 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Annotate(err, "invalid token")
 	}
 
-	claims := tok.ClaimSet
 	wantClaims := &jwt.ClaimSet{
 		Sub: req.User,
 		Iss: x.issuer,
 		Aud: x.audience,
 	}
-
-	if err := jwt.CheckClaimSet(claims, wantClaims); err != nil {
+	if err := jwt.CheckClaimSet(tok.ClaimSet, wantClaims); err != nil {
 		return nil, errcode.Annotate(err, "invalid claims")
 	}
 

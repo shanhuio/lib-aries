@@ -16,6 +16,7 @@
 package identity
 
 import (
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
@@ -132,6 +133,8 @@ func (c *simpleCore) Init(config *CoreConfig) (*Identity, error) {
 	}
 	return id, nil
 }
+
+func (c *simpleCore) Prepare(ctx context.Context) error { return nil }
 
 func (c *simpleCore) Identity() (*Identity, error) {
 	id := new(simpleData)
