@@ -31,6 +31,7 @@ type IDExchangeConfig struct {
 	Audience string
 	Issuer   string
 	Card     identity.Card
+	Now      func() time.Time
 }
 
 // IDExchange exchanges an ID token for an access token.
@@ -53,7 +54,7 @@ func NewIDExchange(
 		card:     config.Card,
 		verifier: identity.NewJWTVerifier(config.Card),
 		tokener:  tok,
-		now:      time.Now,
+		now:      timeutil.NowFunc(config.Now),
 	}
 }
 

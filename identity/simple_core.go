@@ -27,6 +27,7 @@ import (
 	"shanhu.io/misc/hashutil"
 	"shanhu.io/misc/jwt"
 	"shanhu.io/misc/rsautil"
+	"shanhu.io/misc/timeutil"
 )
 
 type simpleData struct {
@@ -62,7 +63,7 @@ type simpleCore struct {
 func NewSimpleCore(store SimpleStore, t func() time.Time) Core {
 	return &simpleCore{
 		store: store,
-		now:   makeNowFunc(t),
+		now:   timeutil.NowFunc(t),
 	}
 }
 

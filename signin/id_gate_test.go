@@ -30,7 +30,7 @@ import (
 	"shanhu.io/misc/timeutil"
 )
 
-func TestService(t *testing.T) {
+func TestIDGate(t *testing.T) {
 	now := time.Now()
 	nowFunc := func() time.Time { return now }
 	core := identity.NewMemCore(nowFunc)
@@ -102,13 +102,13 @@ func TestService(t *testing.T) {
 		Typ: jwt.DefaultType,
 	}, signer)
 	if err != nil {
-		t.Fatal("getting id token:", err)
+		t.Fatal("getting id token: ", err)
 	}
 
 	// try to exchange the id token for access token.
 	appURL, err := url.Parse(appServer.URL)
 	if err != nil {
-		t.Fatal("parse app server url:", err)
+		t.Fatal("parse app server url: ", err)
 	}
 
 	client := httputil.Client{Server: appURL}
@@ -119,7 +119,7 @@ func TestService(t *testing.T) {
 		IDToken:     idToken,
 		TTLDuration: timeutil.NewDuration(5 * time.Minute),
 	}, creds); err != nil {
-		t.Fatal("exchange for credential:", err)
+		t.Fatal("exchange for credential: ", err)
 	}
 
 	client.Token = creds.Token
@@ -136,9 +136,9 @@ func TestService(t *testing.T) {
 
 	got, err := client.GetString("/admin")
 	if err != nil {
-		t.Fatal("getting an admin page:", err)
+		t.Fatal("getting an admin page: ", err)
 	}
-	if got != "admin" {
-		t.Errorf("got %q, want %q", got, "admin")
+	if want := "admin"; got != want {
+		t.Errorf("got %q, want %q", got, want)
 	}
 }

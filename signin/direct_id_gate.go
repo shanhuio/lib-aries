@@ -22,6 +22,7 @@ import (
 	"shanhu.io/aries/identity"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/jwt"
+	"shanhu.io/misc/timeutil"
 )
 
 // DirectIDGate is a simple auth module that directly read ID token from
@@ -41,6 +42,7 @@ type DirectIDGateConfig struct {
 	Audience string
 	Issuer   string
 	Card     identity.Card
+	Now      func() time.Time
 }
 
 // NewDirectIDGate creates a new auth gate that directly checkes the bearer
@@ -51,7 +53,7 @@ func NewDirectIDGate(config *DirectIDGateConfig) *DirectIDGate {
 		issuer:   config.Issuer,
 		card:     config.Card,
 		verifier: identity.NewJWTVerifier(config.Card),
-		now:      time.Now,
+		now:      timeutil.NowFunc(config.Now),
 	}
 }
 

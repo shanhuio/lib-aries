@@ -21,13 +21,6 @@ import (
 	"shanhu.io/misc/errcode"
 )
 
-func makeNowFunc(f func() time.Time) func() time.Time {
-	if f != nil {
-		return f
-	}
-	return time.Now
-}
-
 func publicKeyValid(k *PublicKey, now time.Time) error {
 	if k.NotValidBefore > 0 {
 		if now.Before(time.Unix(k.NotValidBefore, 0)) {
