@@ -28,7 +28,7 @@ import (
 // IDExchangeConfig is the config for creating an identity
 // exchange config.
 type IDExchangeConfig struct {
-	Audiance string
+	Audience string
 	User     string
 	Card     *identity.RemoteCard
 }
@@ -51,7 +51,7 @@ func NewIDExchange(
 	now := time.Now
 	v := identity.NewJWTVerifier(config.Card, now)
 	return &IDExchange{
-		audiance: config.Audiance,
+		audiance: config.Audience,
 		user:     config.User,
 		card:     config.Card,
 		prepare:  config.Card.Prepare,

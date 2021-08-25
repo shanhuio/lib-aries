@@ -16,6 +16,8 @@
 package signin
 
 import (
+	"time"
+
 	"shanhu.io/aries"
 	"shanhu.io/aries/identity"
 )
@@ -65,4 +67,9 @@ func (g *IDGate) Serve(c *aries.C) error {
 // Setup sets up the credentials for the request.
 func (g *IDGate) Setup(c *aries.C) error {
 	return g.gate.Setup(c)
+}
+
+// Token returns a new session token for user that expires in ttl.
+func (g *IDGate) Token(user string, ttl time.Duration) (string, time.Time) {
+	return g.gate.Token(user, ttl)
 }

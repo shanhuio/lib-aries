@@ -70,7 +70,7 @@ func TestService(t *testing.T) {
 			},
 		},
 		Exchange: &IDExchangeConfig{
-			Audiance: "app",
+			Audience: "app",
 			User:     "root",
 			Card:     remoteCard,
 		},
