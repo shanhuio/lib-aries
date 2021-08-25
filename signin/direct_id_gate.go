@@ -37,7 +37,7 @@ type DirectIDGate struct {
 	now      func() time.Time
 }
 
-// DirectIDGateConfig returns a
+// DirectIDGateConfig is the configuration to create a DirectIDGate.
 type DirectIDGateConfig struct {
 	Audience string
 	Issuer   string
@@ -68,6 +68,10 @@ func (g *DirectIDGate) Setup(c *aries.C) error {
 	bearer := aries.Bearer(c)
 	if bearer == "" {
 		return nil
+	}
+
+	if err := g.card.Prepare(c.Context); err != nil {
+		return errcode.Annotate(err, "prepare for token checking")
 	}
 
 	now := g.now()
