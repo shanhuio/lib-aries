@@ -29,14 +29,14 @@ import (
 // exchange config.
 type IDExchangeConfig struct {
 	Audience string
-	User     string
+	Issuer   string
 	Card     *identity.RemoteCard
 }
 
 // IDExchange exchanges an ID token for an access token.
 type IDExchange struct {
 	audience string
-	user     string
+	issuer   string
 	card     identity.Card
 	prepare  func(ctx context.Context) error
 	verifier jwt.Verifier
@@ -50,7 +50,7 @@ func NewIDExchange(
 ) *IDExchange {
 	return &IDExchange{
 		audience: config.Audience,
-		user:     config.User,
+		issuer:   config.Issuer,
 		card:     config.Card,
 		prepare:  config.Card.Prepare,
 		verifier: identity.NewJWTVerifier(config.Card),
@@ -73,26 +73,21 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		}
 	}
 
-	if req.User != x.user {
-		return nil, errcode.Unauthorizedf("invalid user")
-	}
-
 	now := x.now()
-
 	tok, err := jwt.DecodeAndVerify(req.IDToken, x.verifier, now)
 	if err != nil {
 		return nil, errcode.Annotate(err, "invalid token")
 	}
 
 	claims := tok.ClaimSet
-	if claims.Sub != req.User {
-		return nil, errcode.Unauthorizedf("subject does not match user")
+	wantClaims := &jwt.ClaimSet{
+		Sub: req.User,
+		Iss: x.issuer,
+		Aud: x.audience,
 	}
 
-	if x.audience != "" {
-		if x.audience != claims.Aud {
-			return nil, errcode.Unauthorizedf("invalid audiance")
-		}
+	if err := jwt.CheckClaimSet(claims, wantClaims); err != nil {
+		return nil, errcode.Annotate(err, "invalid claims")
 	}
 
 	ttl := time.Duration(req.TTL)

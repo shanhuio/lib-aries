@@ -61,8 +61,8 @@ func TestService(t *testing.T) {
 		Gate: &identity.GateConfig{
 			Check: func(user string) (interface{}, int, error) {
 				switch user {
-				case "root":
-					return "root", 10, nil
+				case "h8liu":
+					return "h8liu", 10, nil
 				case "":
 					return "", 0, nil
 				}
@@ -70,8 +70,8 @@ func TestService(t *testing.T) {
 			},
 		},
 		Exchange: &IDExchangeConfig{
-			Audience: "app",
-			User:     "root",
+			Audience: "myapp.app",
+			Issuer:   "id.shanhu.io",
 			Card:     remoteCard,
 		},
 	})
@@ -93,9 +93,9 @@ func TestService(t *testing.T) {
 	// get an id token.
 	signer := identity.NewJWTSigner(core)
 	idToken, err := jwt.EncodeAndSign(&jwt.ClaimSet{
-		Iss: "root",
-		Aud: "app",
-		Sub: "root",
+		Iss: "id.shanhu.io",
+		Aud: "myapp.app",
+		Sub: "h8liu",
 		Exp: now.Add(time.Hour).Unix(),
 		Iat: now.Unix(),
 		Typ: jwt.DefaultType,
@@ -114,7 +114,7 @@ func TestService(t *testing.T) {
 
 	creds := new(Creds)
 	if err := client.Call("/idtoken/signin", &Request{
-		User:    "root",
+		User:    "h8liu",
 		IDToken: idToken,
 		TTL:     5 * time.Minute.Nanoseconds(),
 	}, creds); err != nil {
@@ -129,8 +129,8 @@ func TestService(t *testing.T) {
 		t.Error("check token: ", err)
 	}
 	t.Logf("token info: %v+", info)
-	if info.User != "root" {
-		t.Errorf("got %q user, want %q", info.User, "root")
+	if want := "h8liu"; info.User != want {
+		t.Errorf("got %q user, want %q", info.User, want)
 	}
 
 	got, err := client.GetString("/admin")

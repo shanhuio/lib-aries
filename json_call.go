@@ -78,8 +78,6 @@ func (j *jsonCall) call(c *C) error {
 		return fmt.Errorf("method is %q; must use POST", m)
 	}
 
-	NeverCache(c) // Never cache an RPC.
-
 	var ret []reflect.Value
 	if !j.noRequest {
 		if j.req.Kind() != reflect.Ptr {
@@ -114,7 +112,6 @@ func (j *jsonCall) call(c *C) error {
 	if j.noResponse {
 		return nil
 	}
-
 	return ReplyJSON(c, resp.Interface())
 }
 

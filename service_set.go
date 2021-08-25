@@ -42,20 +42,20 @@ func (s *ServiceSet) isAdmin(c *C) bool {
 	return s.IsAdmin(c)
 }
 
-func (s *ServiceSet) serveAuth(c *C) error {
-	if s.Auth == nil {
-		return nil
-	}
+// serveAuth performs the auth check.
+func (s *ServiceSet) serveAuth(c *C) (bool, error) {
 	if err := s.Auth.Serve(c); err != Miss {
-		return err
+		return true, err
 	}
-	return s.Auth.Setup(c)
+	return false, s.Auth.Setup(c)
 }
 
 // Serve serves the incoming request with the mux set.
 func (s *ServiceSet) Serve(c *C) error {
-	if err := s.serveAuth(c); err != nil {
+	if served, err := s.serveAuth(c); err != nil {
 		return err
+	} else if served {
+		return nil
 	}
 
 	if err := serveService(s.Resource, c); err != Miss {
