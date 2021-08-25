@@ -103,7 +103,7 @@ func (lg *Login) check(cs *Creds) (bool, error) {
 		return false, nil
 	}
 
-	expires := timeutil.Time(cs.Creds.Expires)
+	expires := timeutil.Time(cs.Creds.ExpiresTime)
 	now := time.Now()
 	if !now.Before(expires) {
 		return false, nil
@@ -132,6 +132,7 @@ func (lg *Login) Token() (string, error) {
 		if newCreds == nil {
 			panic("should have creds loaded from the file system")
 		}
+		newCreds.FixTime()
 		cs = newCreds
 	}
 

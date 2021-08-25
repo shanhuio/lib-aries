@@ -33,9 +33,19 @@ type Request struct {
 
 // Creds is the response for signing in. It saves the user credentials.
 type Creds struct {
-	User    string
-	Token   string
-	Expires *timeutil.Timestamp
+	User        string
+	Token       string
+	ExpiresTime *timeutil.Timestamp `json:",omitempty"`
+
+	Expires int64 `json:",omitempty"` // Nanosecond timestamp, legacy use.
+}
+
+// FixTime fixes timestamps.
+func (c *Creds) FixTime() {
+	if c.ExpiresTime == nil && c.Expires != 0 {
+		t := time.Unix(0, c.Expires)
+		c.ExpiresTime = timeutil.NewTimestamp(t)
+	}
 }
 
 // Tokener issues auth tokens for users.

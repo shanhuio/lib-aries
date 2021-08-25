@@ -98,8 +98,8 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 
 	token, credsExpires := x.tokener.Token(req.User, ttl)
 	return &Creds{
-		User:    req.User,
-		Token:   token,
-		Expires: timeutil.NewTimestamp(credsExpires),
+		User:        req.User,
+		Token:       token,
+		ExpiresTime: timeutil.NewTimestamp(credsExpires),
 	}, nil
 }

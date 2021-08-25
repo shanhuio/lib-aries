@@ -68,8 +68,8 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 	ttl := timeutil.TimeDuration(req.TTL)
 	token, expires := x.Tokener.Token(req.User, ttl)
 	return &Creds{
-		User:    req.User,
-		Token:   token,
-		Expires: timeutil.NewTimestamp(expires),
+		User:        req.User,
+		Token:       token,
+		ExpiresTime: timeutil.NewTimestamp(expires),
 	}, nil
 }

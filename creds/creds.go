@@ -74,6 +74,7 @@ func NewCredsFromRequest(req *Request) (*Creds, error) {
 		return nil, fmt.Errorf("login as user %q, got %q", req.User, got)
 	}
 
+	cs.Creds.FixTime()
 	return cs, nil
 }
 
