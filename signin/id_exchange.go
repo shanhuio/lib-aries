@@ -23,6 +23,7 @@ import (
 	"shanhu.io/aries/identity"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/jwt"
+	"shanhu.io/misc/timeutil"
 )
 
 // IDExchangeConfig is the config for creating an identity
@@ -90,7 +91,7 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Annotate(err, "invalid claims")
 	}
 
-	ttl := time.Duration(req.TTL)
+	ttl := timeutil.TimeDuration(req.TTL)
 	if ttl <= time.Duration(0) {
 		return nil, errcode.Unauthorizedf("ttl too short")
 	}
@@ -99,6 +100,6 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 	return &Creds{
 		User:    req.User,
 		Token:   token,
-		Expires: credsExpires.UnixNano(),
+		Expires: timeutil.NewTimestamp(credsExpires),
 	}, nil
 }

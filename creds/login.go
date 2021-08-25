@@ -23,6 +23,7 @@ import (
 	"shanhu.io/aries"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
+	"shanhu.io/misc/timeutil"
 )
 
 func readEndpointKey(p *Endpoint) (*rsa.PrivateKey, error) {
@@ -102,7 +103,7 @@ func (lg *Login) check(cs *Creds) (bool, error) {
 		return false, nil
 	}
 
-	expires := time.Unix(0, cs.Creds.Expires)
+	expires := timeutil.Time(cs.Creds.Expires)
 	now := time.Now()
 	if !now.Before(expires) {
 		return false, nil

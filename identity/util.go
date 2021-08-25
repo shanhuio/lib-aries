@@ -13,32 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package signin
+package identity
 
 import (
-	"time"
-
-	"shanhu.io/misc/signer"
-	"shanhu.io/misc/timeutil"
+	"fmt"
 )
 
-// Request is the request for signing in.
-type Request struct {
-	User       string
-	SignedTime *signer.SignedRSABlock `json:",omitempty"`
-	IDToken    string                 `json:",omitempty"`
-
-	TTL *timeutil.Duration
-}
-
-// Creds is the response for signing in. It saves the user credentials.
-type Creds struct {
-	User    string
-	Token   string
-	Expires *timeutil.Timestamp
-}
-
-// Tokener issues auth tokens for users.
-type Tokener interface {
-	Token(user string, ttl time.Duration) (string, time.Time)
+// UserAtHost returns the string of user@host.
+func UserAtHost(user, host string) string {
+	return fmt.Sprintf("%s@%s", user, host)
 }

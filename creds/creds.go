@@ -24,6 +24,7 @@ import (
 	"shanhu.io/aries/signin"
 	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/signer"
+	"shanhu.io/misc/timeutil"
 )
 
 // Creds is the credential that is cached after logging in. This can also be
@@ -63,7 +64,7 @@ func NewCredsFromRequest(req *Request) (*Creds, error) {
 	sr := &signin.Request{
 		User:       req.User,
 		SignedTime: signed,
-		TTL:        req.TTL.Nanoseconds(),
+		TTL:        timeutil.NewDuration(req.TTL),
 	}
 	if err := c.JSONCall("/pubkey/signin", sr, &cs.Creds); err != nil {
 		return nil, err

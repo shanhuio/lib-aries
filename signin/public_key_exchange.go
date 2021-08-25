@@ -23,6 +23,7 @@ import (
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/signer"
+	"shanhu.io/misc/timeutil"
 )
 
 // PublicKeyExchange handles sign in using a public key registry. The request
@@ -64,10 +65,11 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Add(errcode.Unauthorized, err)
 	}
 
-	token, expires := x.Tokener.Token(req.User, time.Duration(req.TTL))
+	ttl := timeutil.TimeDuration(req.TTL)
+	token, expires := x.Tokener.Token(req.User, ttl)
 	return &Creds{
 		User:    req.User,
 		Token:   token,
-		Expires: expires.UnixNano(),
+		Expires: timeutil.NewTimestamp(expires),
 	}, nil
 }

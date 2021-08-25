@@ -27,6 +27,7 @@ import (
 	"shanhu.io/aries/identity"
 	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/jwt"
+	"shanhu.io/misc/timeutil"
 )
 
 func TestService(t *testing.T) {
@@ -116,7 +117,7 @@ func TestService(t *testing.T) {
 	if err := client.Call("/idtoken/signin", &Request{
 		User:    "h8liu",
 		IDToken: idToken,
-		TTL:     5 * time.Minute.Nanoseconds(),
+		TTL:     timeutil.NewDuration(5 * time.Minute),
 	}, creds); err != nil {
 		t.Fatal("exchange for credential:", err)
 	}
