@@ -71,19 +71,20 @@ func publicKeyFromCard(card Card, keyID string) (*PublicKey, error) {
 
 type jwtVerifier struct {
 	card Card
-	now  func() time.Time
 }
 
-func newJWTVerifier(card Card, now func() time.Time) *jwtVerifier {
-	return &jwtVerifier{card: card, now: makeNowFunc(now)}
+func newJWTVerifier(card Card) *jwtVerifier {
+	return &jwtVerifier{card: card}
 }
 
 // NewJWTVerifier returns a new JWT verifier using the identity card.
-func NewJWTVerifier(card Card, now func() time.Time) jwt.Verifier {
-	return newJWTVerifier(card, now)
+func NewJWTVerifier(card Card) jwt.Verifier {
+	return newJWTVerifier(card)
 }
 
-func (v *jwtVerifier) Verify(h *jwt.Header, data, sig []byte) error {
+func (v *jwtVerifier) Verify(
+	h *jwt.Header, data, sig []byte, t time.Time,
+) error {
 	if h.Alg != jwt.AlgRS256 {
 		return errcode.InvalidArgf("alg %q not supported", h.Alg)
 	}
@@ -95,7 +96,7 @@ func (v *jwtVerifier) Verify(h *jwt.Header, data, sig []byte) error {
 	if k.Type != rsaKeyType {
 		return errcode.NotFoundf("key type not supported")
 	}
-	if err := publicKeyValid(k, v.now()); err != nil {
+	if err := publicKeyValid(k, t); err != nil {
 		return errcode.Annotate(err, "invalid key")
 	}
 

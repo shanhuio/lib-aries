@@ -51,10 +51,10 @@ func TestJWT(t *testing.T) {
 
 	t.Log("token: ", encoded)
 
-	v := newJWTVerifier(core, nil)
-	decoded, err := jwt.DecodeAndVerify(encoded, v)
+	v := newJWTVerifier(core)
+	decoded, err := jwt.DecodeAndVerify(encoded, v, now)
 	if err != nil {
-		t.Fatal("decode and verity token: ", err)
+		t.Fatal("decode and verify token: ", err)
 	}
 
 	keyID := decoded.Header.KeyID

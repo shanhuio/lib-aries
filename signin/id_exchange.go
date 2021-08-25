@@ -35,7 +35,7 @@ type IDExchangeConfig struct {
 
 // IDExchange exchanges an ID token for an access token.
 type IDExchange struct {
-	audiance string
+	audience string
 	user     string
 	card     identity.Card
 	prepare  func(ctx context.Context) error
@@ -48,16 +48,14 @@ type IDExchange struct {
 func NewIDExchange(
 	tok Tokener, config *IDExchangeConfig,
 ) *IDExchange {
-	now := time.Now
-	v := identity.NewJWTVerifier(config.Card, now)
 	return &IDExchange{
-		audiance: config.Audience,
+		audience: config.Audience,
 		user:     config.User,
 		card:     config.Card,
 		prepare:  config.Card.Prepare,
-		verifier: v,
+		verifier: identity.NewJWTVerifier(config.Card),
 		tokener:  tok,
-		now:      now,
+		now:      time.Now,
 	}
 }
 
@@ -79,7 +77,9 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Unauthorizedf("invalid user")
 	}
 
-	tok, err := jwt.DecodeAndVerify(req.IDToken, x.verifier)
+	now := x.now()
+
+	tok, err := jwt.DecodeAndVerify(req.IDToken, x.verifier, now)
 	if err != nil {
 		return nil, errcode.Annotate(err, "invalid token")
 	}
@@ -89,24 +89,13 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Unauthorizedf("subject does not match user")
 	}
 
-	if x.audiance != "" {
-		if x.audiance != claims.Aud {
+	if x.audience != "" {
+		if x.audience != claims.Aud {
 			return nil, errcode.Unauthorizedf("invalid audiance")
 		}
 	}
 
-	now := x.now()
-
-	claimsTTL, err := jwt.CheckTime(claims, now)
-	if err != nil {
-		return nil, errcode.Annotate(err, "invalid token")
-	}
-
 	ttl := time.Duration(req.TTL)
-	if ttl > claimsTTL {
-		// access token ttl cannot exceed claims ttl
-		ttl = claimsTTL
-	}
 	if ttl <= time.Duration(0) {
 		return nil, errcode.Unauthorizedf("ttl too short")
 	}
