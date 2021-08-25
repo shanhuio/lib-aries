@@ -65,7 +65,7 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Add(errcode.Unauthorized, err)
 	}
 
-	ttl := timeutil.TimeDuration(req.TTL)
+	ttl := req.GetTTL()
 	token, expires := x.Tokener.Token(req.User, ttl)
 	return &Creds{
 		User:        req.User,

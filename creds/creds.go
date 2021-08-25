@@ -62,10 +62,11 @@ func NewCredsFromRequest(req *Request) (*Creds, error) {
 	c.Transport = req.Transport
 
 	sr := &signin.Request{
-		User:       req.User,
-		SignedTime: signed,
-		TTL:        timeutil.NewDuration(req.TTL),
+		User:        req.User,
+		SignedTime:  signed,
+		TTLDuration: timeutil.NewDuration(req.TTL),
 	}
+	sr.FillLegacyTTL()
 	if err := c.JSONCall("/pubkey/signin", sr, &cs.Creds); err != nil {
 		return nil, err
 	}

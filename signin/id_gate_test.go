@@ -115,9 +115,9 @@ func TestService(t *testing.T) {
 
 	creds := new(Creds)
 	if err := client.Call("/idtoken/signin", &Request{
-		User:    "h8liu",
-		IDToken: idToken,
-		TTL:     timeutil.NewDuration(5 * time.Minute),
+		User:        "h8liu",
+		IDToken:     idToken,
+		TTLDuration: timeutil.NewDuration(5 * time.Minute),
 	}, creds); err != nil {
 		t.Fatal("exchange for credential:", err)
 	}

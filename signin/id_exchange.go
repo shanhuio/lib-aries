@@ -91,7 +91,7 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Annotate(err, "invalid claims")
 	}
 
-	ttl := timeutil.TimeDuration(req.TTL)
+	ttl := timeutil.TimeDuration(req.TTLDuration)
 	if ttl <= time.Duration(0) {
 		return nil, errcode.Unauthorizedf("ttl too short")
 	}
