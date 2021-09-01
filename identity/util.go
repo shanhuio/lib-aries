@@ -21,5 +21,8 @@ import (
 
 // UserAtHost returns the string of user@host.
 func UserAtHost(user, host string) string {
+	if host == "" {
+		return user
+	}
 	return fmt.Sprintf("%s@%s", user, host)
 }
