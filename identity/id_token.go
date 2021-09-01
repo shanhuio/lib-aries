@@ -74,6 +74,18 @@ func SignID(signer Signer, config *SignIDConfig) (string, error) {
 	return jwt.EncodeAndSign(claims, NewJWTSigner(signer))
 }
 
+// SelfSignID creates an ID token that is self-signed.
+func SelfSignID(signer Signer, user, domain string, t time.Time) (
+	string, error,
+) {
+	return SignID(signer, &SignIDConfig{
+		User:   user,
+		Domain: domain,
+		Issuer: SelfSignIssuer,
+		Time:   t,
+	})
+}
+
 // VerifySelfSignedID verifies a self-signed ID token that is presented to
 // its owner host.
 func VerifySelfSignedID(
