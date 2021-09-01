@@ -19,10 +19,10 @@ import (
 	"fmt"
 )
 
-// UserAtHost returns the string of user@host.
-func UserAtHost(user, host string) string {
-	if host == "" {
+// UserAtDomain returns the string of user@domain.
+func UserAtDomain(user, domain string) string {
+	if domain == "" {
 		return user
 	}
-	return fmt.Sprintf("%s@%s", user, host)
+	return fmt.Sprintf("%s@%s", user, domain)
 }
