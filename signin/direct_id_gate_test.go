@@ -34,11 +34,7 @@ func TestDirectIDGate(t *testing.T) {
 	nowFunc := func() time.Time { return now }
 
 	core := identity.NewMemCore(nowFunc)
-	core.Init(&identity.CoreConfig{
-		Keys: []*identity.KeyConfig{{
-			NotValidAfter: now.Unix() + 3600,
-		}},
-	})
+	core.Init(identity.SingleKeyCoreConfig(now.Add(time.Hour)))
 
 	gate := NewDirectIDGate(&DirectIDGateConfig{
 		Audience: "myapp.app",

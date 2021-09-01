@@ -25,9 +25,7 @@ func TestMemCore(t *testing.T) {
 	now := time.Now()
 	core := NewMemCore(func() time.Time { return now })
 
-	coreConfig := &CoreConfig{
-		Keys: []*KeyConfig{{NotValidAfter: now.Unix() + 3600}},
-	}
+	coreConfig := SingleKeyCoreConfig(now.Add(time.Hour))
 	initID, err := core.Init(coreConfig)
 	if err != nil {
 		t.Fatal("init core: ", err)

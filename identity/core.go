@@ -17,11 +17,12 @@ package identity
 
 import (
 	"errors"
+	"time"
 )
 
 // KeyConfig is the configuration for a new key.
 type KeyConfig struct {
-	Type           string
+	Type           string // Optional
 	NotValidAfter  int64
 	NotValidBefore int64
 	Comment        string
@@ -30,6 +31,14 @@ type KeyConfig struct {
 // CoreConfig is the configuration for initialiazation of the identity.
 type CoreConfig struct {
 	Keys []*KeyConfig
+}
+
+// SingleKeyCoreConfig creates a simple CoreConfig that creates one
+// single key that expires at expire.
+func SingleKeyCoreConfig(expire time.Time) *CoreConfig {
+	return &CoreConfig{
+		Keys: []*KeyConfig{{NotValidAfter: expire.Unix()}},
+	}
 }
 
 // Core is an identity core that can save the identity keys.
