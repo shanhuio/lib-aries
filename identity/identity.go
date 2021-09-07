@@ -62,4 +62,3 @@ type Card interface {
 	// Identity fetches the identity of the service.
 	Identity() (*Identity, error)
 }
-
