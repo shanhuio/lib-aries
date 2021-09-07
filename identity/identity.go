@@ -19,15 +19,6 @@ import (
 	"context"
 )
 
-// Card provides the Identity of an entity.
-type Card interface {
-	// Prepare prepares the identity for use.
-	Prepare(ctx context.Context) error
-
-	// Identity fetches the identity of the service.
-	Identity() (*Identity, error)
-}
-
 // Identity is the identity of a service or a robot.
 type Identity struct {
 	PublicKeys []*PublicKey `json:",omitempty"`
@@ -62,3 +53,13 @@ func FindPublicKey(id *Identity, keyID string) *PublicKey {
 	}
 	return pub
 }
+
+// Card provides the Identity of an entity.
+type Card interface {
+	// Prepare prepares the identity for use.
+	Prepare(ctx context.Context) error
+
+	// Identity fetches the identity of the service.
+	Identity() (*Identity, error)
+}
+
