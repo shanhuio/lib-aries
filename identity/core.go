@@ -58,3 +58,13 @@ type Core interface {
 // ErrAlreadyInitialized is returned if Init() is called
 // when the KeyStore is already initialized.
 var ErrAlreadyInitialized = errors.New("already initialized")
+
+// MakeSureInit initializes the core if it is not already initialized.
+func MakeSureInit(core Core, config *CoreConfig) error {
+	if _, err := core.Init(config); err != nil {
+		if err != ErrAlreadyInitialized {
+			return err
+		}
+	}
+	return nil
+}

@@ -55,19 +55,13 @@ func NewIDGate(config *IDGateConfig) *IDGate {
 }
 
 // Gate returns the identity gate.
-func (g *IDGate) Gate() *identity.Gate {
-	return g.gate
-}
+func (g *IDGate) Gate() *identity.Gate { return g.gate }
 
-// Serve serves the sign in
-func (g *IDGate) Serve(c *aries.C) error {
-	return g.router.Serve(c)
-}
+// Serve serves the sign in requests.
+func (g *IDGate) Serve(c *aries.C) error { return g.router.Serve(c) }
 
 // Setup sets up the credentials for the request.
-func (g *IDGate) Setup(c *aries.C) error {
-	return g.gate.Setup(c)
-}
+func (g *IDGate) Setup(c *aries.C) error { return g.gate.Setup(c) }
 
 // Token returns a new session token for user that expires in ttl.
 func (g *IDGate) Token(user string, ttl time.Duration) (string, time.Time) {
