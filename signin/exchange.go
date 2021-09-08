@@ -25,17 +25,16 @@ import (
 	"shanhu.io/misc/timeutil"
 )
 
-// IDExchangeConfig is the config for creating an identity
-// exchange config.
-type IDExchangeConfig struct {
+// ExchangeConfig is the config for creating an session exchanger
+// that exchanges access tokens for session tokens.
+type ExchangeConfig struct {
 	Audience string
 	Issuer   string
 	Card     identity.Card
 	Now      func() time.Time
 }
 
-// IDExchange exchanges an ID token for an access token.
-type IDExchange struct {
+type exchange struct {
 	audience string
 	issuer   string
 	card     identity.Card
@@ -44,11 +43,10 @@ type IDExchange struct {
 	now      func() time.Time
 }
 
-// NewIDExchange creates an new identity exchange.
-func NewIDExchange(
-	tok Tokener, config *IDExchangeConfig,
-) *IDExchange {
-	return &IDExchange{
+func newExchange(
+	tok Tokener, config *ExchangeConfig,
+) *exchange {
+	return &exchange{
 		audience: config.Audience,
 		issuer:   config.Issuer,
 		card:     config.Card,
@@ -58,12 +56,11 @@ func NewIDExchange(
 	}
 }
 
-// Exchange exchanges an ID token for an access token.
-func (x *IDExchange) Exchange(c *aries.C, req *Request) (
+func (x *exchange) exchange(c *aries.C, req *Request) (
 	*Creds, error,
 ) {
-	if req.IDToken == "" {
-		return nil, errcode.InvalidArgf("id token missing")
+	if req.AccessToken == "" {
+		return nil, errcode.InvalidArgf("access token missing")
 	}
 
 	if err := x.card.Prepare(c.Context); err != nil {
@@ -71,7 +68,7 @@ func (x *IDExchange) Exchange(c *aries.C, req *Request) (
 	}
 
 	now := x.now()
-	tok, err := jwt.DecodeAndVerify(req.IDToken, x.verifier, now)
+	tok, err := jwt.DecodeAndVerify(req.AccessToken, x.verifier, now)
 	if err != nil {
 		return nil, errcode.Annotate(err, "invalid token")
 	}

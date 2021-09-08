@@ -70,7 +70,7 @@ func TestIDGate(t *testing.T) {
 				return user, 1, nil
 			},
 		},
-		Exchange: &IDExchangeConfig{
+		Exchange: &ExchangeConfig{
 			Audience: "myapp.app",
 			Issuer:   "id.shanhu.io",
 			Card:     remoteCard,
@@ -93,7 +93,7 @@ func TestIDGate(t *testing.T) {
 
 	// get an id token.
 	signer := identity.NewJWTSigner(core)
-	idToken, err := jwt.EncodeAndSign(&jwt.ClaimSet{
+	accessToken, err := jwt.EncodeAndSign(&jwt.ClaimSet{
 		Iss: "id.shanhu.io",
 		Aud: "myapp.app",
 		Sub: "h8liu",
@@ -116,7 +116,7 @@ func TestIDGate(t *testing.T) {
 	creds := new(Creds)
 	if err := client.Call("/idtoken/signin", &Request{
 		User:        "h8liu",
-		IDToken:     idToken,
+		AccessToken: accessToken,
 		TTLDuration: timeutil.NewDuration(5 * time.Minute),
 	}, creds); err != nil {
 		t.Fatal("exchange for credential: ", err)

@@ -22,11 +22,11 @@ import (
 	"shanhu.io/misc/timeutil"
 )
 
-// Request is the request for signing in.
+// Request is the request for signing in and creating a session.
 type Request struct {
-	User       string
-	SignedTime *signer.SignedRSABlock `json:",omitempty"`
-	IDToken    string                 `json:",omitempty"`
+	User        string
+	SignedTime  *signer.SignedRSABlock `json:",omitempty"`
+	AccessToken string                 `json:",omitempty"`
 
 	TTLDuration *timeutil.Duration `json:",omitempty"`
 

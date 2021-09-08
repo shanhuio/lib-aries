@@ -29,23 +29,23 @@ type IDGateConfig struct {
 
 	// Exchange is config for the identity exchange service for exchanging
 	// ID tokens for access tokens.
-	Exchange *IDExchangeConfig
+	Exchange *ExchangeConfig
 }
 
 // IDGate is a gate that has an "/idtoken/signin" method for signing in.
 type IDGate struct {
 	gate     *identity.Gate
 	router   *aries.Router
-	exchange *IDExchange
+	exchange *exchange
 }
 
 // NewIDGate creates a new ID gate with a sign in method.
 func NewIDGate(config *IDGateConfig) *IDGate {
 	g := identity.NewGate(config.Gate)
-	ex := NewIDExchange(g, config.Exchange)
+	ex := newExchange(g, config.Exchange)
 
 	r := aries.NewRouter()
-	r.Call("idtoken/signin", ex.Exchange)
+	r.Call("idtoken/signin", ex.exchange)
 
 	return &IDGate{
 		gate:     g,
