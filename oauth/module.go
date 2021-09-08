@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"shanhu.io/aries"
-	"shanhu.io/aries/identity"
 	"shanhu.io/aries/signin"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/signer"
@@ -31,7 +30,7 @@ import (
 // Module is a module that handles stuff related to oauth.
 type Module struct {
 	config    *Config
-	gate      *identity.Gate
+	gate      *signin.Gate
 	providers []provider
 	pubKey    *signin.PublicKeyExchange
 
@@ -54,7 +53,7 @@ func NewModule(c *Config) *Module {
 		signInRedirect = redirect
 	}
 
-	gate := identity.NewGate(&identity.GateConfig{
+	gate := signin.NewGate(&signin.GateConfig{
 		SessionKey:      c.SessionKey,
 		SessionLifeTime: c.SessionLifeTime,
 		SessionRefresh:  c.SessionRefresh,
@@ -125,7 +124,7 @@ func (m *Module) signOut(c *aries.C) error {
 			return err
 		}
 	}
-	identity.ClearGateCookie(c)
+	signin.ClearGateCookie(c)
 	c.Redirect(m.redirect)
 	return nil
 }
