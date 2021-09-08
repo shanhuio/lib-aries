@@ -22,8 +22,8 @@ import (
 	"shanhu.io/misc/jwt"
 )
 
-// SelfSignIssuer use this to indicate self signing.
-const SelfSignIssuer = "."
+// Self use this to indicate self signing as the issuer.
+const Self = "."
 
 // SignIDConfig provides the configuration to sign an ID token.
 type SignIDConfig struct {
@@ -40,8 +40,8 @@ type SignIDConfig struct {
 	Expiry time.Duration // Optional; default 5 minute.
 }
 
-// SignID signs an ID token.
-func SignID(signer Signer, config *SignIDConfig) (string, error) {
+// SignToken signs a self token or an access token.
+func SignToken(signer Signer, config *SignIDConfig) (string, error) {
 	id := UserAtDomain(config.User, config.Domain)
 	sub := id
 	expiry := config.Expiry
@@ -58,7 +58,7 @@ func SignID(signer Signer, config *SignIDConfig) (string, error) {
 	aud := config.Audience
 	if aud == "" {
 		aud = config.Domain
-		if iss == SelfSignIssuer {
+		if iss == Self {
 			sub = config.User
 		}
 	}
@@ -74,21 +74,21 @@ func SignID(signer Signer, config *SignIDConfig) (string, error) {
 	return jwt.EncodeAndSign(claims, NewJWTSigner(signer))
 }
 
-// SelfSignID creates an ID token that is self-signed.
-func SelfSignID(signer Signer, user, domain string, t time.Time) (
+// SignSelf creates a self token.
+func SignSelf(signer Signer, user, domain string, t time.Time) (
 	string, error,
 ) {
-	return SignID(signer, &SignIDConfig{
+	return SignToken(signer, &SignIDConfig{
 		User:   user,
 		Domain: domain,
-		Issuer: SelfSignIssuer,
+		Issuer: Self,
 		Time:   t,
 	})
 }
 
-// VerifySelfSignedID verifies a self-signed ID token that is presented to
+// VerifySelfToken verifies a self-signed ID token that is presented to
 // its owner host.
-func VerifySelfSignedID(
+func VerifySelfToken(
 	token, user, host string, card Card, t time.Time,
 ) (*jwt.Token, error) {
 	v := NewJWTVerifier(card)
@@ -103,7 +103,7 @@ func VerifySelfSignedID(
 	}
 
 	wantClaims := &jwt.ClaimSet{
-		Iss: SelfSignIssuer,
+		Iss: Self,
 		Sub: user,
 		Aud: host,
 	}
