@@ -25,8 +25,8 @@ import (
 // Self use this to indicate self signing as the issuer.
 const Self = "."
 
-// SignIDConfig provides the configuration to sign an ID token.
-type SignIDConfig struct {
+// SignConfig provides the configuration to sign an ID token.
+type SignConfig struct {
 	User   string
 	Domain string
 
@@ -41,7 +41,7 @@ type SignIDConfig struct {
 }
 
 // SignToken signs a self token or an access token.
-func SignToken(signer Signer, config *SignIDConfig) (string, error) {
+func SignToken(signer Signer, config *SignConfig) (string, error) {
 	id := UserAtDomain(config.User, config.Domain)
 	sub := id
 	expiry := config.Expiry
@@ -78,7 +78,7 @@ func SignToken(signer Signer, config *SignIDConfig) (string, error) {
 func SignSelf(signer Signer, user, domain string, t time.Time) (
 	string, error,
 ) {
-	return SignToken(signer, &SignIDConfig{
+	return SignToken(signer, &SignConfig{
 		User:   user,
 		Domain: domain,
 		Issuer: Self,
