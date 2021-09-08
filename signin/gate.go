@@ -118,14 +118,18 @@ func (g *Gate) Check(c *aries.C) (*CredsInfo, error) {
 
 // Token returns an auth token that is valid for ttl. It returns the token
 // and the expiry time.
-func (g *Gate) Token(user string, ttl time.Duration) (string, time.Time) {
-	return g.sessions.New([]byte(user), ttl)
+func (g *Gate) Token(user string, ttl time.Duration) *Token {
+	token, expire := g.sessions.New([]byte(user), ttl)
+	return &Token{
+		Token:  token,
+		Expire: expire,
+	}
 }
 
 // SetupCookie sets up the cookie for a particular user.
 func (g *Gate) SetupCookie(c *aries.C, user string) {
-	token, expires := g.Token(user, 0)
-	c.WriteCookie(cookieKey, token, expires)
+	token := g.Token(user, 0)
+	c.WriteCookie(cookieKey, token.Token, token.Expire)
 }
 
 // ClearGateCookie clears the gate's session cookie.

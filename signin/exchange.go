@@ -92,10 +92,10 @@ func (x *Exchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.Unauthorizedf("ttl too short")
 	}
 
-	token, credsExpires := x.tokener.Token(req.User, ttl)
+	token := x.tokener.Token(req.User, ttl)
 	return &Creds{
 		User:        req.User,
-		Token:       token,
-		ExpiresTime: timeutil.NewTimestamp(credsExpires),
+		Token:       token.Token,
+		ExpiresTime: timeutil.NewTimestamp(token.Expire),
 	}, nil
 }

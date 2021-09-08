@@ -176,7 +176,7 @@ func (m *Module) signIn(c *aries.C, user *UserMeta, state *State) error {
 }
 
 // Token returns a new session token for user that expires in ttl.
-func (m *Module) Token(user string, ttl time.Duration) (string, time.Time) {
+func (m *Module) Token(user string, ttl time.Duration) *signin.Token {
 	return m.gate.Token(user, ttl)
 }
 
