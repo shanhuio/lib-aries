@@ -34,7 +34,8 @@ type ExchangeConfig struct {
 	Now      func() time.Time
 }
 
-type exchange struct {
+// Exchange exchanges access tokens for a session tokens.
+type Exchange struct {
 	audience string
 	issuer   string
 	card     identity.Card
@@ -43,10 +44,12 @@ type exchange struct {
 	now      func() time.Time
 }
 
-func newExchange(
+// NewExchange creates an exchange that exchnages access tokens
+// for session tokens from tok.
+func NewExchange(
 	tok Tokener, config *ExchangeConfig,
-) *exchange {
-	return &exchange{
+) *Exchange {
+	return &Exchange{
 		audience: config.Audience,
 		issuer:   config.Issuer,
 		card:     config.Card,
@@ -56,7 +59,9 @@ func newExchange(
 	}
 }
 
-func (x *exchange) exchange(c *aries.C, req *Request) (
+// Exchange is the API that exchanges access tokens for session tokens in the
+// form of credentials.
+func (x *Exchange) Exchange(c *aries.C, req *Request) (
 	*Creds, error,
 ) {
 	if req.AccessToken == "" {
