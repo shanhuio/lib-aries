@@ -66,6 +66,15 @@ func (c *Creds) FixTime() {
 	}
 }
 
+// TokenCreds gets the credential from a token.
+func TokenCreds(user string, tok *Token) *Creds {
+	return &Creds{
+		User:        user,
+		Token:       tok.Token,
+		ExpiresTime: timeutil.NewTimestamp(tok.Expire),
+	}
+}
+
 // Token is a token with an expire time.
 type Token struct {
 	Token  string

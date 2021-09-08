@@ -93,9 +93,5 @@ func (x *Exchange) Exchange(c *aries.C, req *Request) (
 	}
 
 	token := x.tokener.Token(req.User, ttl)
-	return &Creds{
-		User:        req.User,
-		Token:       token.Token,
-		ExpiresTime: timeutil.NewTimestamp(token.Expire),
-	}, nil
+	return TokenCreds(req.User, token), nil
 }
