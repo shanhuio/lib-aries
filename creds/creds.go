@@ -67,7 +67,7 @@ func NewCredsFromRequest(req *Request) (*Creds, error) {
 		TTLDuration: timeutil.NewDuration(req.TTL),
 	}
 	sr.FillLegacyTTL()
-	if err := c.JSONCall("/pubkey/signin", sr, &cs.Creds); err != nil {
+	if err := c.Call("/pubkey/signin", sr, &cs.Creds); err != nil {
 		return nil, err
 	}
 
