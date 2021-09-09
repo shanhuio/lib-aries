@@ -136,7 +136,7 @@ func (m *Mailman) Send(
 	client := &httputil.Client{Server: u, Token: curTok.AccessToken}
 
 	const route = "/gmail/v1/users/me/messages/send?alt=json"
-	if err := client.JSONCall(route, &msg, &resp); err != nil {
+	if err := client.Call(route, &msg, &resp); err != nil {
 		return "", err
 	}
 
@@ -192,7 +192,7 @@ func (m *Mailman) serveSetup(c *aries.C) error {
 func (m *Mailman) Router() *aries.Router {
 	r := aries.NewRouter()
 	r.Index(m.serveIndex)
-	r.JSONCallMust("send", m.apiSend)
+	r.Call("send", m.apiSend)
 	r.File("callback", m.serveCallback)
 	r.File("setup", m.serveSetup)
 	return r
