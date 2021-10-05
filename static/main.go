@@ -22,18 +22,18 @@ import (
 	"shanhu.io/aries"
 )
 
-func makeService(dir string) aries.Service {
-	return aries.NewStaticFiles(dir)
+func makeService(root string) aries.Service {
+	return aries.NewStaticFiles(root)
 }
 
 // Main is the main entrance for smlstatic binary
 func Main() {
-	dir := flag.String("dir", ".", "static directory to serve")
+	root := flag.String("root", "lib/site", "static directory to serve")
 	addr := aries.DeclareAddrFlag("localhost:8000")
 	flag.Parse()
 
-	static := makeService(*dir)
-	if err := aries.ListenAndServe(*addr, static); err != nil {
+	s := makeService(*root)
+	if err := aries.ListenAndServe(*addr, s); err != nil {
 		log.Fatal(err)
 	}
 }
