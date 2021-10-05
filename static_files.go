@@ -54,16 +54,25 @@ func (s *StaticFiles) CacheAge(ageSecs int) {
 	}
 }
 
+var contentTypeSuffix = []struct{
+	suffix string
+	contentType string
+} {
+	{ suffix: ".js", contentType: "application/javascript;charset=UTF-8" },
+	{ suffix: ".css", contentType: "text/css;charset=UTF-8" },
+}
+
 // Serve serves incoming HTTP requests.
 func (s *StaticFiles) Serve(c *C) error {
 	c.Req.URL.Path = c.Path
 	if s.cacheControl != "" {
 		c.Resp.Header().Add("Cache-Control", s.cacheControl)
 	}
-	if strings.HasSuffix(c.Req.URL.Path, ".js") {
-		// Make sure javascript files have the correct file type.
-		const jsContentType = "application/javascript;charset=UTF-8"
-		c.Resp.Header().Set("Content-Type", jsContentType)
+	for _, suf := range contentTypeSuffix {
+		if strings.HasSuffix(c.Req.URL.Paht, suf.suffix) {
+			c.Res.Header().Set("Content-Type", suf.contentType)
+			break
+		}
 	}
 	s.h.ServeHTTP(c.Resp, c.Req)
 	return nil
