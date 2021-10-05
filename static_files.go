@@ -54,12 +54,12 @@ func (s *StaticFiles) CacheAge(ageSecs int) {
 	}
 }
 
-var contentTypeSuffix = []struct{
-	suffix string
+var contentTypeSuffix = []struct {
+	suffix      string
 	contentType string
-} {
-	{ suffix: ".js", contentType: "application/javascript;charset=UTF-8" },
-	{ suffix: ".css", contentType: "text/css;charset=UTF-8" },
+}{
+	{suffix: ".js", contentType: "application/javascript;charset=UTF-8"},
+	{suffix: ".css", contentType: "text/css;charset=UTF-8"},
 }
 
 // Serve serves incoming HTTP requests.
@@ -69,8 +69,8 @@ func (s *StaticFiles) Serve(c *C) error {
 		c.Resp.Header().Add("Cache-Control", s.cacheControl)
 	}
 	for _, suf := range contentTypeSuffix {
-		if strings.HasSuffix(c.Req.URL.Paht, suf.suffix) {
-			c.Res.Header().Set("Content-Type", suf.contentType)
+		if strings.HasSuffix(c.Req.URL.Path, suf.suffix) {
+			c.Resp.Header().Set("Content-Type", suf.contentType)
 			break
 		}
 	}
