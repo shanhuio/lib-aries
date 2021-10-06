@@ -18,10 +18,39 @@ package aries
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 
+	"shanhu.io/misc/osutil"
 	"shanhu.io/misc/strutil"
 )
+
+type staticFileSystem struct {
+	fs http.FileSystem
+}
+
+func (s *staticFileSystem) Open(name string) (http.File, error) {
+	base := filepath.Base(name)
+	lastDot := strings.LastIndex(base, ".")
+	if lastDot >= 0 {
+		return s.fs.Open(name)
+	}
+
+	if found, err := osutil.Exist(name); err != nil {
+		return nil, AltInternalf(err, "fail to open %q", name)
+	} else if !found {
+		html := name + ".html" // try again with .html
+		found, err := osutil.Exist(html)
+		if err != nil {
+			return nil, AltInternalf(err, "fail to open %q", html)
+		}
+		if found {
+			return s.fs.Open(html)
+		}
+	}
+
+	return s.fs.Open(name)
+}
 
 // StaticFiles is a module that serves static files.
 type StaticFiles struct {
@@ -30,7 +59,7 @@ type StaticFiles struct {
 }
 
 // DefaultStaticPath is the default path for static files.
-const DefaultStaticPath = "_/static"
+const DefaultStaticPath = "lib/site"
 
 func cacheControl(ageSecs int) string {
 	return fmt.Sprintf("max-age=%d; must-revalidate", ageSecs)
@@ -39,9 +68,10 @@ func cacheControl(ageSecs int) string {
 // NewStaticFiles creates a module that serves static files.
 func NewStaticFiles(p string) *StaticFiles {
 	p = strutil.Default(p, DefaultStaticPath)
+	fs := &staticFileSystem{fs: http.Dir(p)}
 	return &StaticFiles{
 		cacheControl: cacheControl(10),
-		h:            http.FileServer(http.Dir(p)),
+		h:            http.FileServer(fs),
 	}
 }
 
