@@ -30,8 +30,7 @@ type staticFileSystem struct {
 }
 
 func (s *staticFileSystem) Open(name string) (http.File, error) {
-	base := filepath.Base(name)
-	lastDot := strings.LastIndex(base, ".")
+	lastDot := strings.LastIndex(filepath.Base(name), ".")
 	if lastDot >= 0 {
 		return s.fs.Open(name)
 	}
