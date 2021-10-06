@@ -16,12 +16,14 @@
 package aries
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
 
-	"shanhu.io/misc/osutil"
 	"shanhu.io/misc/strutil"
 )
 
@@ -35,20 +37,18 @@ func (s *staticFileSystem) Open(name string) (http.File, error) {
 		return s.fs.Open(name)
 	}
 
-	if found, err := osutil.Exist(name); err != nil {
-		return nil, AltInternalf(err, "fail to open %q", name)
-	} else if !found {
-		html := name + ".html" // try again with .html
-		found, err := osutil.Exist(html)
-		if err != nil {
-			return nil, AltInternalf(err, "fail to open %q", html)
+	f, err := s.fs.Open(name)
+	if errors.Is(err, fs.ErrNotExist) {
+		html := name + ".html"
+		f2, err2 := s.fs.Open(html)
+		if err2 == nil {
+			return f2, nil
 		}
-		if found {
-			return s.fs.Open(html)
+		if !errors.Is(err2, fs.ErrNotExist) {
+			log.Printf("try to open %q: %s", html, err2)
 		}
 	}
-
-	return s.fs.Open(name)
+	return f, err
 }
 
 // StaticFiles is a module that serves static files.
