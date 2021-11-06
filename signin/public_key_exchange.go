@@ -21,7 +21,6 @@ import (
 	"shanhu.io/aries"
 	"shanhu.io/aries/keyreg"
 	"shanhu.io/misc/errcode"
-	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/signer"
 )
 
@@ -46,13 +45,7 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 		return nil, err
 	}
 
-	var key *rsautil.PublicKey
-	for _, k := range keys {
-		if k.HashStr() == req.SignedTime.KeyID {
-			key = k
-			break
-		}
-	}
+	key := keyreg.FindKeyByHash(keys, req.SignedTime.KeyID)
 	if key == nil {
 		return nil, errcode.Unauthorizedf("signing key not authorized")
 	}

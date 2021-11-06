@@ -139,3 +139,13 @@ func IsSimpleName(user string) bool {
 	}
 	return true
 }
+
+// FindKeyByHash finds the key which has the same hash of h.
+func FindKeyByHash(keys []*rsautil.PublicKey, h string) *rsautil.PublicKey {
+	for _, k := range keys {
+		if k.HashStr() == h {
+			return k
+		}
+	}
+	return nil
+}
