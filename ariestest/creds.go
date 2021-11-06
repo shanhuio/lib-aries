@@ -16,29 +16,35 @@
 package ariestest
 
 import (
+	"io/ioutil"
+
 	"shanhu.io/aries/creds"
+	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
 )
 
 // Login log into a server and fetch the token for the given user.
 func Login(c *httputil.Client, user, key string) error {
+	keyBytes, err := ioutil.ReadFile(key)
+	if err != nil {
+		return errcode.Annotate(err, "read key")
+	}
 	endPoint := &creds.Endpoint{
-		User:        user,
-		Server:      c.Server.String(),
-		PemFile:     key,
-		Transport:   c.Transport,
-		Homeless:    true,
-		NoTTY:       true,
-		NoPermCheck: true,
+		User:      user,
+		Server:    c.Server.String(),
+		Key:       keyBytes,
+		Transport: c.Transport,
+		Homeless:  true,
+		NoTTY:     true,
 	}
 
 	login, err := creds.NewLogin(endPoint)
 	if err != nil {
-		return err
+		return errcode.Annotate(err, "make login")
 	}
 	token, err := login.Token()
 	if err != nil {
-		return err
+		return errcode.Annotate(err, "get token")
 	}
 
 	c.Token = token

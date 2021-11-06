@@ -44,9 +44,6 @@ type Endpoint struct {
 
 	Homeless bool // If true, will not look into the home folder for caches.
 	NoTTY    bool // If true, will not fail if the key is encrypted.
-
-	// If skip checking key permission
-	NoPermCheck bool
 }
 
 // CurrentUser returns the new name of current user.
@@ -83,7 +80,6 @@ func NewRobot(user, server, key string, env *aries.Env) *Endpoint {
 	}
 	if env != nil {
 		ep.Transport = env.Transport
-		ep.NoPermCheck = env.Testing
 	}
 	return ep
 }

@@ -20,14 +20,17 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+
+	"shanhu.io/misc/osutil"
 )
 
 // ParsePrivateKey parses the given private key blob.
-func ParsePrivateKey(k string, bs []byte, tty bool) (*rsa.PrivateKey, error) {
+func ParsePrivateKey(name string, bs []byte, tty bool) (
+	*rsa.PrivateKey, error,
+) {
 	b, _ := pem.Decode(bs)
 	if b == nil {
-		return nil, fmt.Errorf("%q decode failed", k)
+		return nil, fmt.Errorf("%q decode failed", name)
 	}
 
 	if !x509.IsEncryptedPEMBlock(b) {
@@ -35,10 +38,10 @@ func ParsePrivateKey(k string, bs []byte, tty bool) (*rsa.PrivateKey, error) {
 	}
 
 	if !tty {
-		return nil, fmt.Errorf("%q is encrypted", k)
+		return nil, fmt.Errorf("%q is encrypted", name)
 	}
 
-	prompt := fmt.Sprintf("Passphrase for %s: ", k)
+	prompt := fmt.Sprintf("Passphrase for %s: ", name)
 	pwd, err := ReadPassword(prompt)
 	if err != nil {
 		return nil, err
@@ -51,26 +54,9 @@ func ParsePrivateKey(k string, bs []byte, tty bool) (*rsa.PrivateKey, error) {
 	return x509.ParsePKCS1PrivateKey(der)
 }
 
-func readPrivateFile(f string, permCheck bool) ([]byte, error) {
-	if permCheck {
-		return ReadPrivateFile(f)
-	}
-	return ioutil.ReadFile(f)
-}
-
-func readPrivateKey(pemFile string, permCheck, tty bool) (
-	*rsa.PrivateKey, error,
-) {
-	bs, err := readPrivateFile(pemFile, permCheck)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePrivateKey(pemFile, bs, tty)
-}
-
 // ReadPrivateKey reads a private key from a key file.
 func ReadPrivateKey(pemFile string, tty bool) (*rsa.PrivateKey, error) {
-	bs, err := ReadPrivateFile(pemFile)
+	bs, err := osutil.ReadPrivateFile(pemFile)
 	if err != nil {
 		return nil, err
 	}

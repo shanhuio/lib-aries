@@ -31,7 +31,7 @@ func readEndpointKey(p *Endpoint) (*rsa.PrivateKey, error) {
 	if p.Key != nil {
 		return ParsePrivateKey("key", p.Key, tty)
 	}
-	return readPrivateKey(p.PemFile, !p.NoPermCheck, tty)
+	return ReadPrivateKey(p.PemFile, tty)
 }
 
 // LoginWithKey uses the given PEM file to login a server, and returns the creds
