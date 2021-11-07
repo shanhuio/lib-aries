@@ -17,48 +17,24 @@ package creds
 
 import (
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
 
-	"shanhu.io/misc/osutil"
+	"shanhu.io/misc/rsautil"
 )
 
 // ParsePrivateKey parses the given private key blob.
 func ParsePrivateKey(name string, bs []byte, tty bool) (
 	*rsa.PrivateKey, error,
 ) {
-	b, _ := pem.Decode(bs)
-	if b == nil {
-		return nil, fmt.Errorf("%q decode failed", name)
+	if tty {
+		return rsautil.ParsePrivateKeyTTY(name, bs)
 	}
-
-	if !x509.IsEncryptedPEMBlock(b) {
-		return x509.ParsePKCS1PrivateKey(b.Bytes)
-	}
-
-	if !tty {
-		return nil, fmt.Errorf("%q is encrypted", name)
-	}
-
-	prompt := fmt.Sprintf("Passphrase for %s: ", name)
-	pwd, err := ReadPassword(prompt)
-	if err != nil {
-		return nil, err
-	}
-
-	der, err := x509.DecryptPEMBlock(b, pwd)
-	if err != nil {
-		return nil, err
-	}
-	return x509.ParsePKCS1PrivateKey(der)
+	return rsautil.ParsePrivateKey(bs)
 }
 
 // ReadPrivateKey reads a private key from a key file.
 func ReadPrivateKey(pemFile string, tty bool) (*rsa.PrivateKey, error) {
-	bs, err := osutil.ReadPrivateFile(pemFile)
-	if err != nil {
-		return nil, err
+	if tty {
+		return rsautil.ReadPrivateKeyTTY(pemFile)
 	}
-	return ParsePrivateKey(pemFile, bs, tty)
+	return rsautil.ReadPrivateKey(pemFile)
 }
