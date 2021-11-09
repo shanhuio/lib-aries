@@ -43,52 +43,52 @@ type Module struct {
 }
 
 // NewModule creates a new oauth module with the given config.
-func NewModule(c *Config) *Module {
-	redirect := c.Redirect
+func NewModule(config *Config) *Module {
+	redirect := config.Redirect
 	if redirect == "" {
 		redirect = "/"
 	}
-	signInRedirect := c.SignInRedirect
+	signInRedirect := config.SignInRedirect
 	if signInRedirect == "" {
 		signInRedirect = redirect
 	}
 
 	gate := signin.NewGate(&signin.GateConfig{
-		SessionKey:      c.SessionKey,
-		SessionLifeTime: c.SessionLifeTime,
-		SessionRefresh:  c.SessionRefresh,
-		Check:           c.Check,
+		SessionKey:      config.SessionKey,
+		SessionLifeTime: config.SessionLifeTime,
+		SessionRefresh:  config.SessionRefresh,
+		Check:           config.Check,
 	})
 
 	ret := &Module{
-		config:         c,
+		config:         config,
 		gate:           gate,
 		redirect:       redirect,
 		signInRedirect: signInRedirect,
 		clients:        make(map[string]*Client),
 	}
 
-	if c.KeyRegistry != nil {
+	if config.KeyRegistry != nil {
 		ret.pubKey = &signin.PublicKeyExchange{
-			KeyRegistry: c.KeyRegistry,
+			KeyRegistry: config.KeyRegistry,
 			Tokener:     gate,
 		}
 	}
 
 	const ttl time.Duration = time.Hour
-	states := signer.NewSessions(c.StateKey, ttl)
+	states := signer.NewSessions(config.StateKey, ttl)
 
 	addProvider := func(p provider) {
 		ret.providers = append(ret.providers, p)
 	}
-	if c.GitHub != nil {
-		addProvider(newGitHub(c.GitHub, states))
+	if config.GitHub != nil {
+		addProvider(newGitHub(config.GitHub, states))
 	}
-	if c.Google != nil {
-		addProvider(newGoogle(c.Google, states))
+	if config.Google != nil {
+		addProvider(newGoogle(config.Google, states))
 	}
-	if c.DigitalOcean != nil {
-		addProvider(newDigitalOcean(c.DigitalOcean, states))
+	if config.DigitalOcean != nil {
+		addProvider(newDigitalOcean(config.DigitalOcean, states))
 	}
 
 	ret.router = ret.makeRouter()
