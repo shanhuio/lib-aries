@@ -13,32 +13,34 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package oauth
+package oauth2
 
 import (
-	"net/url"
-	"strings"
-
 	"shanhu.io/aries"
-	"shanhu.io/misc/errcode"
 )
 
-// ParseRedirect parses an in-site redirection URL.
-// The server parts (scheme, host, port, user info) are discarded.
-func ParseRedirect(redirect string) (string, error) {
-	if redirect == "" {
-		return "", nil
-	}
+type signInHandler struct {
+	client   *Client
+	redirect string
+}
 
-	u, err := url.Parse(redirect)
-	if err != nil {
-		return "", err
+func newSignInHandler(client *Client, redirect string) *signInHandler {
+	return &signInHandler{
+		client:   client,
+		redirect: redirect,
 	}
-	if !strings.HasPrefix(u.Path, "/") {
-		return "", errcode.InvalidArgf(
-			"redirect path part %q is not absolute", u.Path,
-		)
-	}
+}
 
-	return aries.DiscardURLServerParts(u).String(), nil
+func (h *signInHandler) Serve(c *aries.C) error {
+	redirect := h.redirect
+	if r := c.Req.URL.Query().Get("r"); r != "" {
+		parsed, err := ParseRedirect(r)
+		if err != nil {
+			return err
+		}
+		redirect = parsed
+	}
+	state := &State{Dest: redirect}
+	c.Redirect(h.client.SignInURL(state))
+	return nil
 }

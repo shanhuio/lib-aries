@@ -13,25 +13,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package oauth
+package oauth2
 
-import (
-	"shanhu.io/aries"
-)
-
-// UserMeta returns the meta data returned by a sign in.
-type UserMeta struct {
-	Method string
-	ID     string
-	Name   string // Screen name.
-	Email  string
-}
-
-type metaExchange interface {
-	callback(c *aries.C) (*UserMeta, *State, error)
-}
-
-type provider interface {
-	metaExchange
-	client() *Client
+// SingleAdmin returns a user check function for a single admin.
+func SingleAdmin(admin string) func(user string) (interface{}, int, error) {
+	return func(user string) (interface{}, int, error) {
+		if user == admin {
+			return user, 10, nil
+		}
+		return "", 0, nil
+	}
 }

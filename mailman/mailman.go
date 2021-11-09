@@ -25,9 +25,9 @@ import (
 	"path"
 	"time"
 
-	"golang.org/x/oauth2"
+	goauth2 "golang.org/x/oauth2"
 	"shanhu.io/aries"
-	"shanhu.io/aries/oauth"
+	"shanhu.io/aries/oauth2"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/signer"
@@ -35,21 +35,21 @@ import (
 
 // Tokens is an interface that gets and fetches an OAuth2 refresh token.
 type Tokens interface {
-	Get(ctx context.Context, email string) (*oauth2.Token, error)
-	Set(ctx context.Context, email string, t *oauth2.Token) error
+	Get(ctx context.Context, email string) (*goauth2.Token, error)
+	Set(ctx context.Context, email string, t *goauth2.Token) error
 }
 
 // Mailman is a http server module for sending emails using gmail's
 // OAuth2 API.
 type Mailman struct {
-	config *oauth2.Config
-	client *oauth.Client
+	config *goauth2.Config
+	client *oauth2.Client
 	tokens Tokens
 }
 
 // Config contains configuration for a mailman.
 type Config struct {
-	App      *oauth.App
+	App      *oauth2.App
 	StateKey []byte
 	Tokens   Tokens
 }
@@ -62,26 +62,28 @@ func New(c *Config) *Mailman {
 		"https://www.googleapis.com/auth/gmail.send",
 		"https://www.googleapis.com/auth/userinfo.email",
 	}
-	oc := &oauth2.Config{
+	oc := &goauth2.Config{
 		ClientID:     c.App.ID,
 		ClientSecret: c.App.Secret,
 		Scopes:       scopes,
-		Endpoint:     oauth.GoogleEndpoint,
+		Endpoint:     oauth2.GoogleEndpoint,
 		RedirectURL:  c.App.RedirectURL,
 	}
 
 	return &Mailman{
 		config: oc,
-		client: oauth.NewClient(oc, states, oauth.MethodGoogle),
+		client: oauth2.NewClient(oc, states, oauth2.MethodGoogle),
 		tokens: c.Tokens,
 	}
 }
 
 func (m *Mailman) signInURL() string {
-	return m.client.OfflineSignInURL(new(oauth.State))
+	return m.client.OfflineSignInURL(new(oauth2.State))
 }
 
-func (m *Mailman) tokenState(c *aries.C) (*oauth2.Token, *oauth.State, error) {
+func (m *Mailman) tokenState(c *aries.C) (
+	*goauth2.Token, *oauth2.State, error,
+) {
 	return m.client.TokenState(c)
 }
 
@@ -164,7 +166,7 @@ func (m *Mailman) serveCallback(c *aries.C) error {
 	}
 
 	// Get user's email address.
-	user, err := oauth.GetGoogleUserInfo(c.Context, m.client, token)
+	user, err := oauth2.GetGoogleUserInfo(c.Context, m.client, token)
 	if err != nil {
 		return err
 	}

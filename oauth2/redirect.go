@@ -13,14 +13,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package oauth
+package oauth2
 
-// SingleAdmin returns a user check function for a single admin.
-func SingleAdmin(admin string) func(user string) (interface{}, int, error) {
-	return func(user string) (interface{}, int, error) {
-		if user == admin {
-			return user, 10, nil
-		}
-		return "", 0, nil
+import (
+	"net/url"
+	"strings"
+
+	"shanhu.io/aries"
+	"shanhu.io/misc/errcode"
+)
+
+// ParseRedirect parses an in-site redirection URL.
+// The server parts (scheme, host, port, user info) are discarded.
+func ParseRedirect(redirect string) (string, error) {
+	if redirect == "" {
+		return "", nil
 	}
+
+	u, err := url.Parse(redirect)
+	if err != nil {
+		return "", err
+	}
+	if !strings.HasPrefix(u.Path, "/") {
+		return "", errcode.InvalidArgf(
+			"redirect path part %q is not absolute", u.Path,
+		)
+	}
+
+	return aries.DiscardURLServerParts(u).String(), nil
 }

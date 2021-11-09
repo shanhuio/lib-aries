@@ -13,12 +13,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package oauth
+package oauth2
 
-// Sign in methods
-const (
-	MethodGitHub       = "github"
-	MethodGoogle       = "google"
-	MethodDigitalOcean = "digitalocean"
-	MethodBitbucket    = "bitbucket"
+import (
+	"shanhu.io/aries"
 )
+
+// UserMeta returns the meta data returned by a sign in.
+type UserMeta struct {
+	Method string
+	ID     string
+	Name   string // Screen name.
+	Email  string
+}
+
+type metaExchange interface {
+	callback(c *aries.C) (*UserMeta, *State, error)
+}
+
+type provider interface {
+	metaExchange
+	client() *Client
+}
