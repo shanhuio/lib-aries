@@ -49,16 +49,6 @@ func GetGoogleUserInfo(
 	return user, nil
 }
 
-// GoogleApp stores the configuration of a Google oauth2 application.
-type GoogleApp struct {
-	ID          string
-	Secret      string
-	RedirectURL string
-
-	WithProfile bool
-	Scopes      []string
-}
-
 const (
 	googleEmailScope   = "https://www.googleapis.com/auth/userinfo.email"
 	googleProfileScope = "https://www.googleapis.com/auth/userinfo.profile"
@@ -78,7 +68,7 @@ var GoogleEndpoint = oauth2.Endpoint{
 
 type google struct{ c *Client }
 
-func newGoogle(app *GoogleApp, s *signer.Sessions) *google {
+func newGoogle(app *App, s *signer.Sessions) *google {
 	scopeSet := make(map[string]bool)
 	// Google OAuth has to have at least one scope to get user ID.
 	scopeSet[googleEmailScope] = true

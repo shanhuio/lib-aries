@@ -20,4 +20,12 @@ type App struct {
 	ID          string
 	Secret      string
 	RedirectURL string `json:",omitempty"`
+
+	Scopes []string `json:",omitempty"`
+
+	// Used only in GitHub OAuth2
+	WithEmail bool `json:",omitempty"`
+
+	// Used only in Google OAuth2
+	WithProfile bool `json:",omitempty"`
 }

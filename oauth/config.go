@@ -26,9 +26,9 @@ import (
 // JSONConfig is a JSON marshallable config that is commonly used for
 // setting up a server.
 type JSONConfig struct {
-	GitHub       *GitHubApp
-	Google       *GoogleApp
-	DigitalOcean *DigitalOceanApp
+	GitHub       *App
+	Google       *App
+	DigitalOcean *App
 	StateKey     string
 	SessionKey   string
 	SignInBypass string
@@ -65,9 +65,9 @@ func (c *JSONConfig) SimpleGitHubConfig() *Config {
 
 // Config is a module configuration for a GitHub Oauth handling module.
 type Config struct {
-	GitHub       *GitHubApp
-	Google       *GoogleApp
-	DigitalOcean *DigitalOceanApp
+	GitHub       *App
+	Google       *App
+	DigitalOcean *App
 
 	StateKey        []byte
 	SessionKey      []byte

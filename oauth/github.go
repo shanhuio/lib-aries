@@ -26,16 +26,6 @@ import (
 	"shanhu.io/misc/strutil"
 )
 
-// GitHubApp is the configuration of a GitHub Oauth App.
-type GitHubApp struct {
-	ID          string
-	Secret      string
-	RedirectURL string
-
-	WithEmail bool
-	Scopes    []string
-}
-
 type gitHub struct {
 	c          *Client
 	queryEmail bool
@@ -49,7 +39,7 @@ var GitHubEndpoint = oauth2.Endpoint{
 	TokenURL: "https://github.com/login/oauth/access_token",
 }
 
-func newGitHub(app *GitHubApp, s *signer.Sessions) *gitHub {
+func newGitHub(app *App, s *signer.Sessions) *gitHub {
 	scopeSet := make(map[string]bool)
 	if app.WithEmail {
 		scopeSet[gitHubEmailScope] = true

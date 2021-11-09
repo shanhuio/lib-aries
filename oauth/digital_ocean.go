@@ -22,12 +22,6 @@ import (
 	"shanhu.io/misc/signer"
 )
 
-// DigitalOceanApp stores the configuration of a Digital Ocean app.
-type DigitalOceanApp struct {
-	ID     string
-	Secret string
-}
-
 type digitalOcean struct{ c *Client }
 
 var digitalOceanEndpoint = oauth2.Endpoint{
@@ -36,7 +30,7 @@ var digitalOceanEndpoint = oauth2.Endpoint{
 }
 
 func newDigitalOcean(
-	app *DigitalOceanApp, s *signer.Sessions,
+	app *App, s *signer.Sessions,
 ) *digitalOcean {
 	c := NewClient(
 		&oauth2.Config{

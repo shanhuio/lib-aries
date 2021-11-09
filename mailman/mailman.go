@@ -49,7 +49,7 @@ type Mailman struct {
 
 // Config contains configuration for a mailman.
 type Config struct {
-	App      *oauth.GoogleApp
+	App      *oauth.App
 	StateKey []byte
 	Tokens   Tokens
 }
