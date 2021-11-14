@@ -34,7 +34,13 @@ type ExchangeConfig struct {
 	Now      func() time.Time
 }
 
-// Exchange exchanges access tokens for a session tokens.
+// Exchange exchanges an access tokens for a session token. An access token is
+// a JWT that is signed by a realm CA, as a proof that the client has been
+// authorized to access some resource on behalf of the user for a period of
+// time. The session token is a token that is issued by a local tokener, which
+// can be used to access the API. Checking a session token is often a much
+// light-weight local operation, which does not require querying the central
+// realm.
 type Exchange struct {
 	audience string
 	issuer   string
@@ -46,9 +52,7 @@ type Exchange struct {
 
 // NewExchange creates an exchange that exchnages access tokens
 // for session tokens from tok.
-func NewExchange(
-	tok Tokener, config *ExchangeConfig,
-) *Exchange {
+func NewExchange(tok Tokener, config *ExchangeConfig) *Exchange {
 	return &Exchange{
 		audience: config.Audience,
 		issuer:   config.Issuer,
@@ -61,9 +65,7 @@ func NewExchange(
 
 // Exchange is the API that exchanges access tokens for session tokens in the
 // form of credentials.
-func (x *Exchange) Exchange(c *aries.C, req *Request) (
-	*Creds, error,
-) {
+func (x *Exchange) Exchange(c *aries.C, req *Request) (*Creds, error) {
 	if req.AccessToken == "" {
 		return nil, errcode.InvalidArgf("access token missing")
 	}
