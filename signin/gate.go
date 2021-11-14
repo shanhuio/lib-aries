@@ -20,6 +20,7 @@ import (
 
 	"shanhu.io/aries"
 	"shanhu.io/misc/signer"
+	"shanhu.io/misc/timeutil"
 )
 
 const cookieKey = "session"
@@ -54,7 +55,7 @@ type Gate struct {
 func NewGate(config *GateConfig) *Gate {
 	sessionLifeTime := config.SessionLifeTime
 	if sessionLifeTime <= 0 {
-		sessionLifeTime = time.Hour * 24 * 7 // roughly a week
+		sessionLifeTime = timeutil.Week
 	}
 	sessionRefresh := config.SessionRefresh
 	if sessionRefresh <= 0 || sessionRefresh > sessionLifeTime {
