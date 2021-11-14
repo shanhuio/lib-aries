@@ -39,7 +39,8 @@ type GateConfig struct {
 	SessionKey      []byte
 	SessionLifeTime time.Duration
 	SessionRefresh  time.Duration
-	Check           func(user string) (interface{}, int, error)
+
+	Check func(user string) (interface{}, int, error)
 }
 
 // Gate is a token checking gate that checks the auth token
