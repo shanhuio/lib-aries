@@ -23,15 +23,32 @@ import (
 	"shanhu.io/aries"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
+	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/timeutil"
 )
+
+func parsePrivateKey(name string, bs []byte, tty bool) (
+	*rsa.PrivateKey, error,
+) {
+	if tty {
+		return rsautil.ParsePrivateKeyTTY(name, bs)
+	}
+	return rsautil.ParsePrivateKey(bs)
+}
+
+func readPrivateKey(pemFile string, tty bool) (*rsa.PrivateKey, error) {
+	if tty {
+		return rsautil.ReadPrivateKeyTTY(pemFile)
+	}
+	return rsautil.ReadPrivateKey(pemFile)
+}
 
 func readEndpointKey(p *Endpoint) (*rsa.PrivateKey, error) {
 	tty := !p.NoTTY
 	if p.Key != nil {
-		return ParsePrivateKey("key", p.Key, tty)
+		return parsePrivateKey("key", p.Key, tty)
 	}
-	return ReadPrivateKey(p.PemFile, tty)
+	return readPrivateKey(p.PemFile, tty)
 }
 
 // LoginWithKey uses the given PEM file to login a server, and returns the creds
