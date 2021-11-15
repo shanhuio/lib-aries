@@ -69,10 +69,9 @@ func NewModule(config *Config) *Module {
 	}
 
 	if config.KeyRegistry != nil {
-		ret.pubKey = &signin.PublicKeyExchange{
-			KeyRegistry: config.KeyRegistry,
-			Tokener:     gate,
-		}
+		ret.pubKey = signin.NewPublicKeyExchange(
+			gate, config.KeyRegistry,
+		)
 	}
 
 	const ttl time.Duration = time.Hour

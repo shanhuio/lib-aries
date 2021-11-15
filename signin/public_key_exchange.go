@@ -27,8 +27,19 @@ import (
 // PublicKeyExchange handles sign in using a public key registry. The request
 // presents a signed time using the user's private key to authenticate.
 type PublicKeyExchange struct {
-	Tokener     Tokener
-	KeyRegistry keyreg.KeyRegistry
+	tokener     Tokener
+	keyRegistry keyreg.KeyRegistry
+}
+
+// NewPublicKeyExchange creates a legacy public key based credential exchange
+// where the client presents a signed time with its private key.
+func NewPublicKeyExchange(
+	tok Tokener, reg keyreg.KeyRegistry,
+) *PublicKeyExchange {
+	return &PublicKeyExchange{
+		tokener:     tok,
+		keyRegistry: reg,
+	}
 }
 
 // Exchange handles the request to exchange a public-key signed timestamp to a
@@ -40,7 +51,7 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 		return nil, errcode.InvalidArgf("signature missing")
 	}
 
-	keys, err := x.KeyRegistry.Keys(req.User)
+	keys, err := x.keyRegistry.Keys(req.User)
 	if err != nil {
 		return nil, err
 	}
@@ -58,6 +69,6 @@ func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
 	}
 
 	ttl := req.GetTTL()
-	token := x.Tokener.Token(req.User, ttl)
+	token := x.tokener.Token(req.User, ttl)
 	return TokenCreds(req.User, token), nil
 }
