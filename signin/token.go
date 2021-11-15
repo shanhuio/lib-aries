@@ -13,13 +13,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package creds
+package signin
 
-// Poke pokes a server with the default creds.
-func Poke(server string, path string) error {
-	c, err := Dial(server)
-	if err != nil {
-		return err
-	}
-	return c.Poke(path)
+import (
+	"time"
+)
+
+// Token is a token with an expire time.
+type Token struct {
+	Token  string
+	Expire time.Time
+}
+
+// Tokener issues auth tokens for users.
+type Tokener interface {
+	Token(user string, ttl time.Duration) *Token
 }

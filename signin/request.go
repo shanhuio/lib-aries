@@ -74,14 +74,3 @@ func TokenCreds(user string, tok *Token) *Creds {
 		ExpiresTime: timeutil.NewTimestamp(tok.Expire),
 	}
 }
-
-// Token is a token with an expire time.
-type Token struct {
-	Token  string
-	Expire time.Time
-}
-
-// Tokener issues auth tokens for users.
-type Tokener interface {
-	Token(user string, ttl time.Duration) *Token
-}
