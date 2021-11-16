@@ -110,10 +110,20 @@ func (s *SSHCertExchange) apiSignIn(
 		return nil, errcode.Unauthorizedf("unrecognized CA")
 	}
 
-	// Check the time and the signature.
+	// Check the time and the certificate.
 	checker := &ssh.CertChecker{Clock: s.nowFunc}
 	if err := checker.CheckCert(user, cert); err != nil {
 		return nil, errcode.Annotate(err, "check certificate failed")
+	}
+
+	// Check the signature.
+	sig := &ssh.Signature{
+		Format: req.Sig.Format,
+		Blob:   req.Sig.Blob,
+		Rest:   req.Sig.Rest,
+	}
+	if err := cert.Verify(req.RecordBytes, sig); err != nil {
+		return nil, errcode.Annotate(err, "check signature")
 	}
 
 	// Get a token.

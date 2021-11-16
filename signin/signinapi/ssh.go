@@ -6,15 +6,22 @@ import (
 
 // SSHSignInRecord is the record that is being signed
 type SSHSignInRecord struct {
-	User      string `json:",omitempty"`
+	User      string
 	Challenge []byte
-	TTL       *timeutil.Duration
+	TTL       *timeutil.Duration `json:",omitempty"`
 }
 
 // SSHSignInRequest is the request to sign in with an SSH certificate
 // credential.
 type SSHSignInRequest struct {
 	RecordBytes []byte // JSON encoded SSHSignInRecord
-	Sig         []byte
+	Sig         *SSHSignature
 	Certificate string
+}
+
+// SSHSignature is a copy of *ssh.Signature, it represents an SSH signature.
+type SSHSignature struct {
+	Format string
+	Blob   []byte
+	Rest   []byte
 }
