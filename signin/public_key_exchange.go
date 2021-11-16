@@ -20,6 +20,7 @@ import (
 
 	"shanhu.io/aries"
 	"shanhu.io/aries/keyreg"
+	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/signer"
 )
@@ -44,8 +45,8 @@ func NewPublicKeyExchange(
 
 // Exchange handles the request to exchange a public-key signed timestamp to a
 // token.
-func (x *PublicKeyExchange) Exchange(c *aries.C, req *Request) (
-	*Creds, error,
+func (x *PublicKeyExchange) Exchange(c *aries.C, req *signinapi.Request) (
+	*signinapi.Creds, error,
 ) {
 	if req.SignedTime == nil {
 		return nil, errcode.InvalidArgf("signature missing")

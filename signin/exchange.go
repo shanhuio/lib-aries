@@ -20,6 +20,7 @@ import (
 
 	"shanhu.io/aries"
 	"shanhu.io/aries/identity"
+	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/jwt"
 	"shanhu.io/misc/timeutil"
@@ -65,7 +66,9 @@ func NewExchange(tok Tokener, config *ExchangeConfig) *Exchange {
 
 // Exchange is the API that exchanges access tokens for session tokens in the
 // form of credentials.
-func (x *Exchange) Exchange(c *aries.C, req *Request) (*Creds, error) {
+func (x *Exchange) Exchange(c *aries.C, req *signinapi.Request) (
+	*signinapi.Creds, error,
+) {
 	if req.AccessToken == "" {
 		return nil, errcode.InvalidArgf("access token missing")
 	}

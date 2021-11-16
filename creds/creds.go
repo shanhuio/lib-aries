@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"time"
 
-	"shanhu.io/aries/signin"
+	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/signer"
 	"shanhu.io/misc/timeutil"
@@ -30,8 +30,8 @@ import (
 // Creds is the credential that is cached after logging in. This can also be
 // saved in JSON format in user's home directory.
 type Creds struct {
-	Server       string
-	signin.Creds // User name is saved in this.
+	Server          string
+	signinapi.Creds // User name is saved in this.
 }
 
 // Request contains the configuration to create a credential.
@@ -61,7 +61,7 @@ func NewCredsFromRequest(req *Request) (*Creds, error) {
 	}
 	c.Transport = req.Transport
 
-	sr := &signin.Request{
+	sr := &signinapi.Request{
 		User:        req.User,
 		SignedTime:  signed,
 		TTLDuration: timeutil.NewDuration(req.TTL),
