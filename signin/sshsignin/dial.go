@@ -29,9 +29,10 @@ import (
 // Config contains the configuration to sign in with an SSH
 // certificate.
 type Config struct {
-	User       string      // Default using SHANHU_USER or system user name.
-	Agent      agent.Agent // Default using SSH_AUTH_SOCK
-	KeyComment string      // Default is "shanhu"
+	User string // Default using SHANHU_USER or system user name.
+
+	Agent      agent.ExtendedAgent // Default using SSH_AUTH_SOCK
+	KeyComment string              // Default is "shanhu"
 }
 
 func (c *Config) user() (string, error) {
@@ -41,7 +42,7 @@ func (c *Config) user() (string, error) {
 	return SysUser()
 }
 
-func (c *Config) agent() (agent.Agent, error) {
+func (c *Config) agent() (agent.ExtendedAgent, error) {
 	if c.Agent != nil {
 		return c.Agent, nil
 	}
@@ -78,6 +79,9 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 	if err != nil {
 		return nil, errcode.Annotate(err, "find key")
 	}
+	if t := key.Type(); t != ssh.CertAlgoRSAv01 {
+		return nil, errcode.Internalf("unexpected key type %q", t)
+	}
 
 	client, err := httputil.NewClient(server)
 	if err != nil {
@@ -99,7 +103,8 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 	if err != nil {
 		return nil, errcode.Annotate(err, "marshal signin record")
 	}
-	sig, err := ag.Sign(key, recordBytes)
+	const signFlag = agent.SignatureFlagRsaSha256
+	sig, err := ag.SignWithFlags(key, recordBytes, signFlag)
 	if err != nil {
 		return nil, errcode.Annotate(err, "sign signin record")
 	}
