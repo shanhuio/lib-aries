@@ -34,7 +34,10 @@ import (
 type SSHCertExchangeConfig struct {
 	CAPublicKeyFile string
 	ChallengeKey    []byte
-	Now             func() time.Time
+
+	// Time function for checking certificate. It is not used for
+	// token generation.
+	Now func() time.Time
 }
 
 // SSHCertExchange is a service stub that provides session tokens if the
@@ -81,6 +84,7 @@ func (s *SSHCertExchange) apiSignIn(
 		return nil, errcode.InvalidArgf("user name is empty")
 	}
 
+	// Parse Certificate.
 	certKey, _, _, _, err := ssh.ParseAuthorizedKey(
 		[]byte(req.Certificate),
 	)
@@ -91,24 +95,28 @@ func (s *SSHCertExchange) apiSignIn(
 	if !ok {
 		return nil, errcode.InvalidArgf("invalid certificate")
 	}
+
+	// Check if it is a user certificate.
 	if cert.CertType != ssh.UserCert {
 		return nil, errcode.InvalidArgf("not a user certificate")
 	}
 
+	// Check CA key.
 	cryptoPubKey, ok := cert.SignatureKey.(ssh.CryptoPublicKey)
 	if !ok {
 		return nil, errcode.InvalidArgf("not a crypto public key")
 	}
-
 	if !s.caPublicKey.Equal(cryptoPubKey.CryptoPublicKey()) {
 		return nil, errcode.Unauthorizedf("unrecognized CA")
 	}
 
+	// Check the time and the signature.
 	checker := &ssh.CertChecker{Clock: s.nowFunc}
 	if err := checker.CheckCert(user, cert); err != nil {
 		return nil, errcode.Annotate(err, "check certificate failed")
 	}
 
+	// Get a token.
 	ttl := timeutil.TimeDuration(record.TTL)
 	token := s.tokener.Token(user, ttl)
 	return TokenCreds(user, token), nil
