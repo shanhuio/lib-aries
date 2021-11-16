@@ -6,13 +6,9 @@ import (
 
 // SSHSignInRecord is the record that is being signed
 type SSHSignInRecord struct {
+	User      string `json:",omitempty"`
 	Challenge []byte
-
-	// User is the user to sign in as. This Can be used to impersonate a
-	// different user.
-	User string `json:",omitempty"`
-
-	TTL *timeutil.Duration
+	TTL       *timeutil.Duration
 }
 
 // SSHSignInRequest is the request to sign in with an SSH certificate

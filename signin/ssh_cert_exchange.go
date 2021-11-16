@@ -17,13 +17,25 @@ package signin
 
 import (
 	"crypto/rsa"
+	"encoding/json"
+	"time"
 
+	"golang.org/x/crypto/ssh"
 	"shanhu.io/aries"
 	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/signer"
+	"shanhu.io/misc/timeutil"
 )
+
+// SSHCertExchangeConfig is the configuration to create an SSH certificate
+// signin stub.
+type SSHCertExchangeConfig struct {
+	CAPublicKeyFile string
+	ChallengeKey    []byte
+	Now             func() time.Time
+}
 
 // SSHCertExchange is a service stub that provides session tokens if the
 // user signs a challenge and the SSH certificate of it.
@@ -33,13 +45,7 @@ type SSHCertExchange struct {
 	caPublicKey *rsa.PublicKey
 	chSigner    *signer.Signer
 	chSrc       *ChallengeSource
-}
-
-// SSHCertExchangeConfig is the configuration to create an SSH certificate
-// signin stub.
-type SSHCertExchangeConfig struct {
-	CAPublicKeyFile string
-	ChallengeKey    []byte
+	nowFunc     func() time.Time
 }
 
 // NewSSHCertExchange creates a new SSH certificate exchange that exchanges
@@ -59,13 +65,53 @@ func NewSSHCertExchange(tok Tokener, conf *SSHCertExchangeConfig) (
 		caPublicKey: caPubKey,
 		chSigner:    ch,
 		chSrc:       chSrc,
+		nowFunc:     timeutil.NowFunc(conf.Now),
 	}, nil
 }
 
 func (s *SSHCertExchange) apiSignIn(
 	c *aries.C, req *signinapi.SSHSignInRequest,
 ) (*signinapi.Creds, error) {
-	panic("todo")
+	record := new(signinapi.SSHSignInRecord)
+	if err := json.Unmarshal(req.RecordBytes, record); err != nil {
+		return nil, errcode.Annotate(err, "parse signin record")
+	}
+	user := record.User
+	if user == "" {
+		return nil, errcode.InvalidArgf("user name is empty")
+	}
+
+	certKey, _, _, _, err := ssh.ParseAuthorizedKey(
+		[]byte(req.Certificate),
+	)
+	if err != nil {
+		return nil, errcode.Annotate(err, "parse certificate")
+	}
+	cert, ok := certKey.(*ssh.Certificate)
+	if !ok {
+		return nil, errcode.InvalidArgf("invalid certificate")
+	}
+	if cert.CertType != ssh.UserCert {
+		return nil, errcode.InvalidArgf("not a user certificate")
+	}
+
+	cryptoPubKey, ok := cert.SignatureKey.(ssh.CryptoPublicKey)
+	if !ok {
+		return nil, errcode.InvalidArgf("not a crypto public key")
+	}
+
+	if !s.caPublicKey.Equal(cryptoPubKey.CryptoPublicKey()) {
+		return nil, errcode.Unauthorizedf("unrecognized CA")
+	}
+
+	checker := &ssh.CertChecker{Clock: s.nowFunc}
+	if err := checker.CheckCert(user, cert); err != nil {
+		return nil, errcode.Annotate(err, "check certificate failed")
+	}
+
+	ttl := timeutil.TimeDuration(record.TTL)
+	token := s.tokener.Token(user, ttl)
+	return TokenCreds(user, token), nil
 }
 
 // API returns the API router stub for signing in with SSH certificate
