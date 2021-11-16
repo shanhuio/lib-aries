@@ -18,6 +18,8 @@ package signin
 import (
 	"crypto/rsa"
 
+	"shanhu.io/aries"
+	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/signer"
@@ -58,4 +60,19 @@ func NewSSHCertExchange(tok Tokener, conf *SSHCertExchangeConfig) (
 		chSigner:    ch,
 		chSrc:       chSrc,
 	}, nil
+}
+
+func (s *SSHCertExchange) apiSignIn(
+	c *aries.C, req *signinapi.SSHSignInRequest,
+) (*signinapi.Creds, error) {
+	panic("todo")
+}
+
+// API returns the API router stub for signing in with SSH certificate
+// credentials.
+func (s *SSHCertExchange) API() *aries.Router {
+	r := aries.NewRouter()
+	r.Call("challenge", s.chSrc.Serve)
+	r.Call("signin", s.apiSignIn)
+	return r
 }

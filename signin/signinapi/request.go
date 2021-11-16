@@ -48,31 +48,3 @@ func (r *Request) GetTTL() time.Duration {
 	}
 	return timeutil.TimeDuration(r.TTLDuration)
 }
-
-// Creds is the response for signing in. It saves the user credentials.
-type Creds struct {
-	User        string
-	Token       string
-	ExpiresTime *timeutil.Timestamp `json:",omitempty"`
-
-	Expires int64 `json:",omitempty"` // Nanosecond timestamp, legacy use.
-}
-
-// FixTime fixes timestamps.
-func (c *Creds) FixTime() {
-	if c.ExpiresTime == nil && c.Expires != 0 {
-		t := time.Unix(0, c.Expires)
-		c.ExpiresTime = timeutil.NewTimestamp(t)
-	}
-}
-
-// ChallengeRequest is the request to get a challenge.
-type ChallengeRequest struct{}
-
-// ChallengeResponse is the response that contains a challenge for the
-// client to sign. The challenge normally can only be used once and must be
-// used with in a small, limited time window upon issued.
-type ChallengeResponse struct {
-	Challenge []byte
-	Time      *timeutil.Timestamp
-}
