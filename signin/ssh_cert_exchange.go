@@ -32,7 +32,8 @@ import (
 // SSHCertExchangeConfig is the configuration to create an SSH certificate
 // signin stub.
 type SSHCertExchangeConfig struct {
-	CAPublicKeyFile string
+	CAPublicKey     []byte `json:",omitempty"`
+	CAPublicKeyFile string `json:",omitempty"`
 	ChallengeKey    []byte
 
 	// Time function for checking certificate. It is not used for
@@ -56,9 +57,19 @@ type SSHCertExchange struct {
 func NewSSHCertExchange(tok Tokener, conf *SSHCertExchangeConfig) (
 	*SSHCertExchange, error,
 ) {
-	caPubKey, err := rsautil.ReadPublicKey(conf.CAPublicKeyFile)
-	if err != nil {
-		return nil, errcode.Annotate(err, "read CA public key")
+	var caPubKey *rsa.PublicKey
+	if conf.CAPublicKey != nil {
+		k, err := rsautil.ParsePublicKey(conf.CAPublicKey)
+		if err != nil {
+			return nil, errcode.Annotate(err, "parse CA public key")
+		}
+		caPubKey = k
+	} else {
+		k, err := rsautil.ReadPublicKey(conf.CAPublicKeyFile)
+		if err != nil {
+			return nil, errcode.Annotate(err, "read CA public key")
+		}
+		caPubKey = k
 	}
 
 	ch := signer.New(conf.ChallengeKey)

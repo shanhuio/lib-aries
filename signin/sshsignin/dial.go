@@ -90,7 +90,7 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 
 	chReq := &signinapi.ChallengeRequest{}
 	chResp := new(signinapi.ChallengeResponse)
-	const chPath = "/sshcert/challenge"
+	const chPath = "/ssh/challenge"
 	if err := client.Call(chPath, chReq, chResp); err != nil {
 		return nil, errcode.Annotate(err, "get challenge")
 	}
@@ -120,7 +120,7 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 	}
 
 	creds := new(signinapi.Creds)
-	if err := client.Call("/sshcert/signin", req, creds); err != nil {
+	if err := client.Call("/ssh/signin", req, creds); err != nil {
 		return nil, err
 	}
 
