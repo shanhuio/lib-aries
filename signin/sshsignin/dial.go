@@ -63,6 +63,17 @@ func FindKey(ag agent.Agent, comment string) (*agent.Key, error) {
 	return nil, errcode.NotFoundf("%q not found", comment)
 }
 
+func findKey(ag agent.Agent, comment string) (*agent.Key, error) {
+	k, err := findKey(ag, comment)
+	if err != nil {
+		if errcode.IsNotFound(err) { // converts not found error into internal.
+			return nil, errcode.Add(errcode.Internal, err)
+		}
+		return nil, err
+	}
+	return k, nil
+}
+
 // Dial signs in a server and returns the credentials.
 func Dial(server string, config *Config) (*httputil.Client, error) {
 	user, err := config.user()
@@ -76,7 +87,7 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 	}
 
 	keyComment := strutil.Default(config.KeyComment, "shanhu")
-	key, err := FindKey(ag, keyComment)
+	key, err := findKey(ag, keyComment)
 	if err != nil {
 		return nil, errcode.Annotate(err, "find key")
 	}
