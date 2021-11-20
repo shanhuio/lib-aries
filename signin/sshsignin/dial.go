@@ -49,7 +49,8 @@ func (c *Config) agent() (agent.ExtendedAgent, error) {
 	return SysAgent()
 }
 
-func findKey(ag agent.Agent, comment string) (*agent.Key, error) {
+// FindKey finds the agent key in the SSH agent that has the exact comment.
+func FindKey(ag agent.Agent, comment string) (*agent.Key, error) {
 	keys, err := ag.List()
 	if err != nil {
 		return nil, errcode.Annotate(err, "list keys")
@@ -75,7 +76,7 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 	}
 
 	keyComment := strutil.Default(config.KeyComment, "shanhu")
-	key, err := findKey(ag, keyComment)
+	key, err := FindKey(ag, keyComment)
 	if err != nil {
 		return nil, errcode.Annotate(err, "find key")
 	}
