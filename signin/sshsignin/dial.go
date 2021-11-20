@@ -60,7 +60,7 @@ func FindKey(ag agent.Agent, comment string) (*agent.Key, error) {
 			return k, nil
 		}
 	}
-	return nil, errcode.Internalf("%q not found", comment)
+	return nil, errcode.NotFoundf("%q not found", comment)
 }
 
 // Dial signs in a server and returns the credentials.
