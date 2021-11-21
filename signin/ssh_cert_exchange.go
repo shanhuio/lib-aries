@@ -151,3 +151,8 @@ func (s *SSHCertExchange) API() *aries.Router {
 	r.Call("signin", s.apiSignIn)
 	return r
 }
+
+// AddAPI adds the API to under /ssh .
+func (s *SSHCertExchange) AddAPI(r *aries.Router) {
+	r.DirService("ssh", s.API())
+}
