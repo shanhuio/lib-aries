@@ -32,9 +32,11 @@ import (
 // SSHCertExchangeConfig is the configuration to create an SSH certificate
 // signin stub.
 type SSHCertExchangeConfig struct {
-	CAPublicKey     []byte `json:",omitempty"`
-	CAPublicKeyFile string `json:",omitempty"`
-	ChallengeKey    []byte
+	CAPublicKey     []byte                 `json:",omitempty"`
+	CAPublicKeyFunc func() ([]byte, error) `json:",omitempty"`
+	CAPublicKeyFile string                 `json:",omitempty"`
+
+	ChallengeKey []byte
 
 	// Time function for checking certificate. It is not used for
 	// token generation.
@@ -52,26 +54,38 @@ type SSHCertExchange struct {
 	nowFunc     func() time.Time
 }
 
+func caPublicKeyFromConfig(conf *SSHCertExchangeConfig) (
+	*rsa.PublicKey, error,
+) {
+	if conf.CAPublicKeyFile != "" {
+		return rsautil.ReadPublicKey(conf.CAPublicKeyFile)
+	}
+
+	var keyBytes = conf.CAPublicKey
+	if keyBytes == nil && conf.CAPublicKeyFunc != nil {
+		bs, err := conf.CAPublicKeyFunc()
+		if err != nil {
+			return nil, errcode.Annotate(err, "fetch CA public key")
+		}
+		keyBytes = bs
+	}
+
+	k, err := rsautil.ParsePublicKey(keyBytes)
+	if err != nil {
+		return nil, errcode.Annotate(err, "parse CA public key")
+	}
+	return k, nil
+}
+
 // NewSSHCertExchange creates a new SSH certificate exchange that exchanges
 // signed challenges for session tokens.
 func NewSSHCertExchange(tok Tokener, conf *SSHCertExchangeConfig) (
 	*SSHCertExchange, error,
 ) {
-	var caPubKey *rsa.PublicKey
-	if conf.CAPublicKey != nil {
-		k, err := rsautil.ParsePublicKey(conf.CAPublicKey)
-		if err != nil {
-			return nil, errcode.Annotate(err, "parse CA public key")
-		}
-		caPubKey = k
-	} else {
-		k, err := rsautil.ReadPublicKey(conf.CAPublicKeyFile)
-		if err != nil {
-			return nil, errcode.Annotate(err, "read CA public key")
-		}
-		caPubKey = k
+	caPubKey, err := caPublicKeyFromConfig(conf)
+	if err != nil {
+		return nil, errcode.Annotate(err, "read CA public key")
 	}
-
 	ch := signer.New(conf.ChallengeKey)
 	chSrc := NewChallengeSource(&ChallengeSourceConfig{Signer: ch})
 	return &SSHCertExchange{
