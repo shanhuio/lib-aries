@@ -18,7 +18,6 @@ package oauth2
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"golang.org/x/oauth2"
 	"shanhu.io/aries"
@@ -80,7 +79,7 @@ func (g *gitHub) callback(c *aries.C) (*UserMeta, *State, error) {
 
 	var user struct {
 		Login string `json:"login"`
-		ID    int    `json:"id"`
+		ID    int64  `json:"id"`
 	}
 	if err := json.Unmarshal(bs, &user); err != nil {
 		return nil, nil, err
@@ -115,7 +114,7 @@ func (g *gitHub) callback(c *aries.C) (*UserMeta, *State, error) {
 	}
 	meta := &UserMeta{
 		Method: MethodGitHub,
-		ID:     strconv.Itoa(user.ID),
+		ID:     fmt.Sprint(user.ID),
 		Name:   user.Login,
 		Email:  email,
 	}
