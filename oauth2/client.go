@@ -18,11 +18,13 @@ package oauth2
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"golang.org/x/oauth2"
 	"shanhu.io/aries"
+	"shanhu.io/misc/errcode"
+	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/signer"
 )
 
@@ -108,20 +110,23 @@ func (c *Client) TokenState(ctx *aries.C) (*oauth2.Token, *State, error) {
 	return tok, state, nil
 }
 
-// Get gets an URL using the given token.
-func (c *Client) Get(
-	ctx context.Context, tok *oauth2.Token, url string,
+func getWithToken(
+	ctx context.Context, u string, tok *oauth2.Token,
 ) ([]byte, error) {
-	callClient := c.config.Client(ctx, tok)
-	resp, err := callClient.Get(url)
+	urlParsed, err := url.Parse(u)
 	if err != nil {
-		return nil, fmt.Errorf("oauth2 get: %v", err)
+		return nil, errcode.Annotate(err, "parse URL")
 	}
-	defer resp.Body.Close()
 
-	bs, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("oauth2 read body: %v", err)
+	serverURL := &url.URL{
+		Scheme: urlParsed.Scheme,
+		Opaque: urlParsed.Opaque,
+		Host:   urlParsed.Host,
 	}
-	return bs, nil
+
+	client := &httputil.Client{
+		Server: serverURL,
+		Token:  tok.AccessToken,
+	}
+	return client.GetBytes(urlParsed.Path)
 }

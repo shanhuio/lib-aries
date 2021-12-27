@@ -36,7 +36,8 @@ type GoogleUserInfo struct {
 func GetGoogleUserInfo(
 	ctx context.Context, c *Client, tok *oauth2.Token,
 ) (*GoogleUserInfo, error) {
-	bs, err := c.Get(ctx, tok, "https://www.googleapis.com/oauth2/v3/userinfo")
+	const apiPath = "https://www.googleapis.com/oauth2/v3/userinfo"
+	bs, err := getWithToken(ctx, apiPath, tok)
 	if err != nil {
 		return nil, err
 	}

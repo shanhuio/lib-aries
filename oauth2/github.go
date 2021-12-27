@@ -72,7 +72,7 @@ func (g *gitHub) callback(c *aries.C) (*UserMeta, *State, error) {
 		return nil, nil, err
 	}
 
-	bs, err := g.c.Get(c.Context, tok, "https://api.github.com/user")
+	bs, err := getWithToken(c.Context, "https://api.github.com/user", tok)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -91,7 +91,7 @@ func (g *gitHub) callback(c *aries.C) (*UserMeta, *State, error) {
 	var email string
 	if g.queryEmail {
 		const url = "https://api.github.com/user/emails"
-		bs, err := g.c.Get(c.Context, tok, url)
+		bs, err := getWithToken(c.Context, url, tok)
 		if err != nil {
 			return nil, nil, err
 		}
