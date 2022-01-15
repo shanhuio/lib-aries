@@ -408,5 +408,7 @@ rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
 shanhu.io/misc v0.0.0-20220115003718-efc8d12040b2 h1:fNfdRcHVUtKUkHUQTs6Up5g5kJhJ9/0jf8d7AG3dTU8=
 shanhu.io/misc v0.0.0-20220115003718-efc8d12040b2/go.mod h1:MC5VU8N1Ex2DxTJxpdX3tYk2DFRxFHszWDJt/k4qYyI=
+shanhu.io/misc v0.0.0-20220115064517-385b1007b63d h1:27VccZEm6pTKzgrfg2mmEVw8rLHG5/MSgHqeJpo1mIg=
+shanhu.io/misc v0.0.0-20220115064517-385b1007b63d/go.mod h1:MC5VU8N1Ex2DxTJxpdX3tYk2DFRxFHszWDJt/k4qYyI=
 shanhu.io/text v0.0.0-20211223054527-6b1ed066cd84 h1:W+u9kUwghYUqeE+wbovbF8OhcI7B2KXRzbj/teMWYAM=
 shanhu.io/text v0.0.0-20211223054527-6b1ed066cd84/go.mod h1:Np11lL3hfbT5QunuDgouCl65s112Pz3QHvNAdXpJWq8=
