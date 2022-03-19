@@ -16,7 +16,7 @@
 package keyreg
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -67,7 +67,7 @@ func (r *MemKeyRegistry) Keys(user string) ([]*rsautil.PublicKey, error) {
 // NewDirKeyRegistry creates a new keystore with public keys saved in
 // files under a directory.
 func NewDirKeyRegistry(dir string) (*MemKeyRegistry, error) {
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func NewDirKeyRegistry(dir string) (*MemKeyRegistry, error) {
 		if !IsSimpleName(name) {
 			continue
 		}
-		bs, err := ioutil.ReadFile(filepath.Join(dir, name))
+		bs, err := os.ReadFile(filepath.Join(dir, name))
 		if err != nil {
 			return nil, errcode.Annotatef(err, "read key %q", name)
 		}
@@ -115,7 +115,7 @@ func (s *FileKeyRegistry) Keys(user string) ([]*rsautil.PublicKey, error) {
 	if !found {
 		return nil, errUserNotFound(user)
 	}
-	bs, err := ioutil.ReadFile(f)
+	bs, err := os.ReadFile(f)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,6 @@ package creds
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -72,7 +71,7 @@ func WriteHomeFile(f string, bs []byte) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(p, bs, 0600)
+	return os.WriteFile(p, bs, 0600)
 }
 
 // WriteHomeJSONFile updates a file under the home directory with a

@@ -18,9 +18,9 @@ package keyreg
 import (
 	"testing"
 
-	"io/ioutil"
 	"net/http/httptest"
 	"net/url"
+	"os"
 
 	"shanhu.io/aries"
 	"shanhu.io/misc/errcode"
@@ -28,7 +28,7 @@ import (
 )
 
 func TestMemKeyRegistry(t *testing.T) {
-	keyBytes, err := ioutil.ReadFile("testdata/keys/yumuzi")
+	keyBytes, err := os.ReadFile("testdata/keys/yumuzi")
 	if err != nil {
 		t.Fatal(err)
 	}
