@@ -33,11 +33,11 @@ type Repo struct {
 }
 
 func host(path string) string {
-	i := strings.Index(path, "/")
-	if i < 0 {
-		return path
+	host, _, found := strings.Cut(path, "/")
+	if found {
+		return host
 	}
-	return path[:i]
+	return path
 }
 
 // NewGitRepo creates a new git repository for import redirection.
