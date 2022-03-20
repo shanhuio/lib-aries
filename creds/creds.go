@@ -23,7 +23,6 @@ import (
 	"shanhu.io/aries/signin/signinapi"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
-	"shanhu.io/misc/rsautil"
 	"shanhu.io/misc/signer"
 	"shanhu.io/misc/timeutil"
 )
@@ -91,23 +90,4 @@ func NewCreds(server, user string, k *rsa.PrivateKey) (*Creds, error) {
 		Key:    k,
 	}
 	return NewCredsFromRequest(req)
-}
-
-// DialRobot dials the server with the given key bytes.
-func DialRobot(server, user string, key []byte) (*httputil.Client, error) {
-	k, err := rsautil.ParsePrivateKey(key)
-	if err != nil {
-		return nil, errcode.Annotate(err, "parse key")
-	}
-
-	req := &Request{
-		Server: server,
-		User:   user,
-		Key:    k,
-	}
-	creds, err := NewCredsFromRequest(req)
-	if err != nil {
-		return nil, errcode.Annotate(err, "get creds")
-	}
-	return httputil.NewTokenClient(server, creds.Token)
 }
