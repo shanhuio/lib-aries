@@ -43,14 +43,6 @@ func newServer(c *config) (aries.Func, error) {
 	return s.redirect, nil
 }
 
-func makeService(env *aries.Env) (aries.Service, error) {
-	s, err := newServer(env.Config.(*config))
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
-}
-
 // Main is the main entrance for the redirect service.
 func Main() {
 	addr := aries.DeclareAddrFlag("localhost:8000")

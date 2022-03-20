@@ -16,7 +16,6 @@
 package aries
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"hash/fnv"
@@ -26,38 +25,8 @@ import (
 	"os"
 	"strings"
 
-	"shanhu.io/misc/errcode"
-	"shanhu.io/misc/jsonutil"
-	"shanhu.io/misc/jsonx"
-	"shanhu.io/misc/osutil"
 	"shanhu.io/misc/unixhttp"
 )
-
-func loadConfig(file string, config interface{}) error {
-	if file == "" {
-		for _, try := range []string{
-			"config.jsonx",
-			"config.json",
-		} {
-			ok, err := osutil.IsRegular(try)
-			if err != nil {
-				return err
-			}
-			if ok {
-				file = try
-				break
-			}
-		}
-	}
-	if file == "" {
-		return errcode.InvalidArgf("config file not specified")
-	}
-
-	if strings.HasSuffix(file, ".json") {
-		return jsonutil.ReadFile(file, config)
-	}
-	return jsonx.ReadFile(file, config)
-}
 
 // ListenAndServe serves on the address. If the address ends
 // with .sock, it ListenAndServe's on the unix domain socket.
@@ -67,27 +36,6 @@ func ListenAndServe(addr string, s Service) error {
 		return unixhttp.ListenAndServe(addr, Serve(s))
 	}
 	return http.ListenAndServe(addr, Serve(s))
-}
-
-// RunMainLegacy runs the main body of a http server.
-func RunMainLegacy(
-	b BuildFunc, configFile string, config interface{}, addr string,
-) error {
-	if config != nil {
-		if err := loadConfig(configFile, config); err != nil {
-			return errcode.Annotate(err, "load config file")
-		}
-	}
-
-	s, err := b(&Env{
-		Context: context.Background(),
-		Config:  config,
-	})
-	if err != nil {
-		return err
-	}
-
-	return ListenAndServe(addr, s)
 }
 
 // DeclareAddrFlag declares the -addr flag.
