@@ -18,9 +18,9 @@ package creds
 import (
 	"context"
 	"crypto/rsa"
+	"net/http"
 	"time"
 
-	"shanhu.io/aries"
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
 	"shanhu.io/misc/rsautil"
@@ -107,9 +107,9 @@ func NewLogin(p *Endpoint) (*Login, error) {
 
 // NewRobotLogin is a shorthand for NewLogin(NewRobot())
 func NewRobotLogin(
-	user, server, key string, env *aries.Env,
+	user, server, key string, tr http.RoundTripper,
 ) (*Login, error) {
-	return NewLogin(NewRobot(user, server, key, env))
+	return NewLogin(NewRobot(user, server, key, tr))
 }
 
 func (lg *Login) check(cs *Creds) (bool, error) {

@@ -19,8 +19,6 @@ import (
 	"net/http"
 	"os"
 	"os/user"
-
-	"shanhu.io/aries"
 )
 
 // Endpoint contains the login stub configuration.
@@ -70,16 +68,13 @@ func NewEndpoint(server string) (*Endpoint, error) {
 }
 
 // NewRobot creates a new robot endpoint.
-func NewRobot(user, server, key string, env *aries.Env) *Endpoint {
-	ep := &Endpoint{
-		Server:   server,
-		User:     user,
-		PemFile:  key,
-		Homeless: true,
-		NoTTY:    true,
+func NewRobot(user, server, key string, tr http.RoundTripper) *Endpoint {
+	return &Endpoint{
+		Server:    server,
+		User:      user,
+		PemFile:   key,
+		Homeless:  true,
+		NoTTY:     true,
+		Transport: tr,
 	}
-	if env != nil {
-		ep.Transport = env.Transport
-	}
-	return ep
 }
