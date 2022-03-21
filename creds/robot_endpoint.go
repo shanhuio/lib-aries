@@ -18,6 +18,7 @@ package creds
 import (
 	"shanhu.io/misc/errcode"
 	"shanhu.io/misc/httputil"
+	"shanhu.io/misc/osutil"
 	"shanhu.io/misc/rsautil"
 )
 
@@ -26,6 +27,16 @@ type RobotEndpoint struct {
 	Server string
 	User   string
 	Key    []byte
+}
+
+// LoadKeyFile loads the key from file f.
+func (ep *RobotEndpoint) LoadKeyFile(f string) error {
+	bs, err := osutil.ReadPrivateFile(f)
+	if err != nil {
+		return err
+	}
+	ep.Key = bs
+	return nil
 }
 
 // Dial dials the server and returns a client with token.
