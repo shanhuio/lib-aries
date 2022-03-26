@@ -396,7 +396,7 @@ honnef.co/go/tools v0.0.1-2020.1.4/go.mod h1:X/FiERA/W4tHapMX5mGpAtMSVEeEUOyHaw9
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
-shanhu.io/misc v0.0.0-20220319030403-dbbc9988844d h1:SkLmQKBrS8LBUK551tVuxiYsMy+f5/lrKIrOoohTkbI=
-shanhu.io/misc v0.0.0-20220319030403-dbbc9988844d/go.mod h1:gvDa+la7KDXnDTzip1O5vMjRP/E/b8/RumF231RNsn8=
+shanhu.io/misc v0.0.0-20220326221015-6f2423569484 h1:HCK1Ili3rQ85lEtAtco8zRjHuaTSk3ZsISlFRdPzKnQ=
+shanhu.io/misc v0.0.0-20220326221015-6f2423569484/go.mod h1:wi81bC9p5C+P4rOEmWD0Vjg3mdUFjUuyAzz0Ikj2fhM=
 shanhu.io/text v0.0.0-20220122184333-0dca95772fe1 h1:e06ysulZWNSHFJ66dNELt2EsSaurDajTpYEZNauI+T0=
 shanhu.io/text v0.0.0-20220122184333-0dca95772fe1/go.mod h1:Np11lL3hfbT5QunuDgouCl65s112Pz3QHvNAdXpJWq8=
