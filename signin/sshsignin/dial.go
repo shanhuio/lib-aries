@@ -136,6 +136,6 @@ func Dial(server string, config *Config) (*httputil.Client, error) {
 		return nil, err
 	}
 
-	client.Token = creds.Token
+	client.TokenSource = httputil.NewStaticToken(creds.Token)
 	return client, nil
 }

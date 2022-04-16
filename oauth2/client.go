@@ -125,8 +125,8 @@ func getWithToken(
 	}
 
 	client := &httputil.Client{
-		Server: serverURL,
-		Token:  tok.AccessToken,
+		Server:      serverURL,
+		TokenSource: httputil.NewStaticToken(tok.AccessToken),
 	}
 	return client.GetBytes(urlParsed.Path)
 }

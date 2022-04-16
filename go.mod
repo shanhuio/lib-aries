@@ -7,7 +7,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-	shanhu.io/misc v0.0.0-20220414050540-8fe9b86d97ea
+	shanhu.io/misc v0.0.0-20220416024331-a99a86f2db1c
 )
 
 require (

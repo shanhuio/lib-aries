@@ -47,6 +47,6 @@ func Login(c *httputil.Client, user, key string) error {
 		return errcode.Annotate(err, "get token")
 	}
 
-	c.Token = token
+	c.TokenSource = httputil.NewStaticToken(token)
 	return nil
 }

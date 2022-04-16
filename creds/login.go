@@ -184,7 +184,9 @@ type loginTokenSource struct {
 	login *Login
 }
 
-func (s *loginTokenSource) Token(_ context.Context) (string, error) {
+func (s *loginTokenSource) Token(
+	_ context.Context, tr http.RoundTripper,
+) (string, error) {
 	return s.login.Token()
 }
 

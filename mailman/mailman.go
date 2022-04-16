@@ -135,7 +135,10 @@ func (m *Mailman) Send(
 		Scheme: "https",
 		Host:   "www.googleapis.com",
 	}
-	client := &httputil.Client{Server: u, Token: curTok.AccessToken}
+	client := &httputil.Client{
+		Server:      u,
+		TokenSource: httputil.NewStaticToken(curTok.AccessToken),
+	}
 
 	const route = "/gmail/v1/users/me/messages/send?alt=json"
 	if err := client.Call(route, &msg, &resp); err != nil {
