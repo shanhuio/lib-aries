@@ -47,7 +47,7 @@ type C struct {
 func NewContext(w http.ResponseWriter, req *http.Request) *C {
 	isHTTPS := false
 	u := req.URL
-	if strings.ToLower(u.Scheme) == "https" {
+	if req.TLS != nil {
 		isHTTPS = true
 	} else if strings.ToLower(req.Header.Get("X-Forwarded-Proto")) == "https" {
 		isHTTPS = true
