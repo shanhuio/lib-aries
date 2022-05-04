@@ -50,7 +50,7 @@ func NewTLSConfigs(domains []string) (*TLSConfigs, error) {
 	}
 
 	serverConfig := &tls.Config{
-		NextProtos:   []string{"http/1.1"},
+		NextProtos:   []string{"http/1.1", "h2"},
 		Certificates: []tls.Certificate{tlsCert},
 	}
 
