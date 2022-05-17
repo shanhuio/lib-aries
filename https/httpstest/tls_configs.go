@@ -18,6 +18,7 @@ package httpstest
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"crypto/elliptic"
 	"fmt"
 	"net/http"
 
@@ -39,7 +40,7 @@ func NewTLSConfigs(domains []string) (*TLSConfigs, error) {
 		Hosts: hosts,
 		IsCA:  true,
 	}
-	cert, err := https.MakeRSACert(c, 0)
+	cert, err := https.MakeECCert(c, elliptic.P256())
 	if err != nil {
 		return nil, fmt.Errorf("make RSA cert: %s", err)
 	}
