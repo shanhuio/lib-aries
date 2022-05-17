@@ -17,6 +17,8 @@ package https
 
 import (
 	"testing"
+
+	"shanhu.io/misc/errcode"
 )
 
 func TestNewCACert(t *testing.T) {
@@ -31,8 +33,8 @@ func TestNewCACert(t *testing.T) {
 }
 
 func TestMakeRSACertWithNoHost(t *testing.T) {
-	_, err := MakeRSACert(new(RSACertConfig))
-	if err == nil {
-		t.Errorf("expect error with not host, got nil")
+	_, err := MakeRSACert(&CertConfig{}, 0)
+	if !errcode.IsInvalidArg(err) {
+		t.Errorf("expect invalid arg error without hosts, got %s", err)
 	}
 }

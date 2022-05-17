@@ -16,7 +16,20 @@
 package https
 
 import (
+	"bytes"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
+	"net"
+	"time"
+
+	"shanhu.io/misc/errcode"
 )
 
 // Cert contains a certificate in memory.
@@ -29,4 +42,158 @@ type Cert struct {
 // for use in an HTTPS server.
 func (c *Cert) X509KeyPair() (tls.Certificate, error) {
 	return tls.X509KeyPair(c.Cert, c.Key)
+}
+
+// CertConfig is the configuration for creating a RSA-based HTTPS
+// certificate.
+type CertConfig struct {
+	Hosts    []string
+	IsCA     bool
+	Start    *time.Time
+	Duration time.Duration
+	Bits     int
+}
+
+// NewCACert creates a CA cert for the given domain.
+func NewCACert(domain string) (*Cert, error) {
+	c := &CertConfig{
+		Hosts: []string{domain},
+		IsCA:  true,
+	}
+	return MakeRSACert(c, 0)
+}
+
+func (c *CertConfig) start() time.Time {
+	if c.Start != nil {
+		return *c.Start
+	}
+	return time.Now()
+}
+
+func (c *CertConfig) duration() time.Duration {
+	if c.Duration <= 0 {
+		return time.Hour * 24 * 30
+	}
+	return c.Duration
+}
+
+func makeTemplate(c *CertConfig) (*x509.Certificate, error) {
+	start := c.start()
+	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
+	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
+	if err != nil {
+		return nil, errcode.Annotate(err, "generate serial number")
+	}
+
+	const org = "Acme Co"
+	const keyUsage = x509.KeyUsageKeyEncipherment |
+		x509.KeyUsageDigitalSignature
+
+	template := x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject:      pkix.Name{Organization: []string{org}},
+		NotBefore:    start,
+		NotAfter:     start.Add(c.duration()),
+
+		KeyUsage:    keyUsage,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+
+		BasicConstraintsValid: true,
+	}
+
+	for _, h := range c.Hosts {
+		if ip := net.ParseIP(h); ip != nil {
+			template.IPAddresses = append(template.IPAddresses, ip)
+		} else {
+			template.DNSNames = append(template.DNSNames, h)
+		}
+	}
+
+	if c.IsCA {
+		template.IsCA = true
+		template.KeyUsage |= x509.KeyUsageCertSign
+	}
+
+	return &template, nil
+}
+
+// MakeRSACert creates RSA-based HTTPs certificates.
+func MakeRSACert(c *CertConfig, bits int) (*Cert, error) {
+	if len(c.Hosts) == 0 {
+		return nil, errcode.InvalidArgf("no host specified")
+	}
+
+	if bits == 0 {
+		bits = 2048
+	}
+	priv, err := rsa.GenerateKey(rand.Reader, bits)
+	if err != nil {
+		return nil, errcode.Annotate(err, "generate private key")
+	}
+	template, err := makeTemplate(c)
+	if err != nil {
+		return nil, errcode.Annotate(err, "make certificate template")
+	}
+
+	derBytes, err := x509.CreateCertificate(
+		rand.Reader, template, template, &priv.PublicKey, priv,
+	)
+	if err != nil {
+		return nil, errcode.Annotate(err, "create certificate")
+	}
+
+	certOut := new(bytes.Buffer)
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+
+	keyOut := new(bytes.Buffer)
+	pem.Encode(keyOut, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(priv),
+	})
+
+	return &Cert{
+		Cert: certOut.Bytes(),
+		Key:  keyOut.Bytes(),
+	}, nil
+}
+
+// MakeECCert creates ECDSA-based HTTPs certificates.
+func MakeECCert(c *CertConfig, curve elliptic.Curve) (*Cert, error) {
+	if len(c.Hosts) == 0 {
+		return nil, errcode.InvalidArgf("no host specified")
+	}
+
+	priv, err := ecdsa.GenerateKey(curve, rand.Reader)
+	if err != nil {
+		return nil, errcode.Annotate(err, "generate private key")
+	}
+	template, err := makeTemplate(c)
+	if err != nil {
+		return nil, errcode.Annotate(err, "make certificate template")
+	}
+
+	derBytes, err := x509.CreateCertificate(
+		rand.Reader, template, template, &priv.PublicKey, priv,
+	)
+	if err != nil {
+		return nil, errcode.Annotate(err, "create certificate")
+	}
+
+	certOut := new(bytes.Buffer)
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+
+	pemBytes, err := x509.MarshalECPrivateKey(priv)
+	if err != nil {
+		return nil, errcode.Annotate(err, "marshal key bytes")
+	}
+	keyOut := new(bytes.Buffer)
+	pem.Encode(keyOut, &pem.Block{
+		Type:  "EC PRIVATE KEY",
+		Bytes: pemBytes,
+	})
+
+	return &Cert{
+		Cert: certOut.Bytes(),
+		Key:  keyOut.Bytes(),
+	}, nil
 }

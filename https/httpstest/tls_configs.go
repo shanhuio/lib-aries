@@ -35,11 +35,11 @@ type TLSConfigs struct {
 func NewTLSConfigs(domains []string) (*TLSConfigs, error) {
 	hosts := []string{"127.0.0.1", "::1"}
 	hosts = append(hosts, domains...)
-	c := &https.RSACertConfig{
+	c := &https.CertConfig{
 		Hosts: hosts,
 		IsCA:  true,
 	}
-	cert, err := https.MakeRSACert(c)
+	cert, err := https.MakeRSACert(c, 0)
 	if err != nil {
 		return nil, fmt.Errorf("make RSA cert: %s", err)
 	}
