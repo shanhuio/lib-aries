@@ -51,7 +51,6 @@ type CertConfig struct {
 	IsCA     bool
 	Start    *time.Time
 	Duration time.Duration
-	Bits     int
 }
 
 // NewCACert creates a CA cert for the given domain.
@@ -117,7 +116,7 @@ func makeTemplate(c *CertConfig) (*x509.Certificate, error) {
 	return &template, nil
 }
 
-// MakeRSACert creates RSA-based HTTPs certificates.
+// MakeRSACert creates RSA-based TLS certificates.
 func MakeRSACert(c *CertConfig, bits int) (*Cert, error) {
 	if len(c.Hosts) == 0 {
 		return nil, errcode.InvalidArgf("no host specified")
@@ -157,7 +156,12 @@ func MakeRSACert(c *CertConfig, bits int) (*Cert, error) {
 	}, nil
 }
 
-// MakeECCert creates ECDSA-based HTTPs certificates.
+// MakeEC256Cert creates a ECDSA-256 TLS certificate.
+func MakeEC256Cert(c *CertConfig) (*Cert, error) {
+	return MakeECCert(c, elliptic.P256())
+}
+
+// MakeECCert creates a ECDSA-based HTTPs certificate.
 func MakeECCert(c *CertConfig, curve elliptic.Curve) (*Cert, error) {
 	if len(c.Hosts) == 0 {
 		return nil, errcode.InvalidArgf("no host specified")

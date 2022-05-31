@@ -16,9 +16,9 @@
 package httpstest
 
 import (
+	"crypto/elliptic"
 	"crypto/tls"
 	"crypto/x509"
-	"crypto/elliptic"
 	"fmt"
 	"net/http"
 
